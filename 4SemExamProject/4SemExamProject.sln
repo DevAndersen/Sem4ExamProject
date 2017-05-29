@@ -1,0 +1,34 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 15
+VisualStudioVersion = 15.0.26430.6
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NeatLib", "NeatLib\NeatLib.csproj", "{0699F6E8-2D87-4887-B25E-20B43619389D}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NeatVisualizer", "NeatVisualizer\NeatVisualizer.csproj", "{715EA610-6B2F-4BB4-BE0A-1421A14FAE52}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NeatConsole", "NeatConsole\NeatConsole.csproj", "{417ADA82-DA9B-45DF-B745-A821EEEC8570}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{0699F6E8-2D87-4887-B25E-20B43619389D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0699F6E8-2D87-4887-B25E-20B43619389D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0699F6E8-2D87-4887-B25E-20B43619389D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0699F6E8-2D87-4887-B25E-20B43619389D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{715EA610-6B2F-4BB4-BE0A-1421A14FAE52}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{715EA610-6B2F-4BB4-BE0A-1421A14FAE52}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{715EA610-6B2F-4BB4-BE0A-1421A14FAE52}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{715EA610-6B2F-4BB4-BE0A-1421A14FAE52}.Release|Any CPU.Build.0 = Release|Any CPU
+		{417ADA82-DA9B-45DF-B745-A821EEEC8570}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{417ADA82-DA9B-45DF-B745-A821EEEC8570}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{417ADA82-DA9B-45DF-B745-A821EEEC8570}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{417ADA82-DA9B-45DF-B745-A821EEEC8570}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal

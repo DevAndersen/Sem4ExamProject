@@ -20,6 +20,7 @@ namespace NeatVisualizer
     public partial class MainWindow : Window
     {
         List<Control> controlsToDisable;
+        Thread executionThread;
 
         public MainWindow()
         {
@@ -37,7 +38,7 @@ namespace NeatVisualizer
         private void BtnExecute_Click(object sender, RoutedEventArgs e)
         {
             BackgroundGrid.Background = new SolidColorBrush(Color.FromRgb(75, 75, 75));
-            Thread executionThread = new Thread(() =>
+            executionThread = new Thread(() =>
             {
                 ExecuteNeat();
             });
@@ -86,7 +87,7 @@ namespace NeatVisualizer
                 expectedOutputs[i] = 1;
             }
 
-            Ann ann = neat.Train(100, 1000, 0.05, 3, 30, wait, inputs, expectedOutputs, Crossover.BestParentClone);
+            Ann ann = neat.Train(100, 1000, 0.05, 3, 30, wait, inputs, expectedOutputs, Crossover.TwoPointCrossover);
 
             Dispatcher.Invoke(() =>
             {
@@ -248,5 +249,10 @@ namespace NeatVisualizer
         }
 
         #endregion
+
+        private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
+        {
+            executionThread?.Abort();
+        }
     }
 }

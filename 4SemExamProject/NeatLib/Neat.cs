@@ -34,7 +34,11 @@ namespace NeatLib
                 {
                     for (int startingIndividual = 0; startingIndividual < generationSize; startingIndividual++)
                     {
-                        generation[startingIndividual] = new Ann(inputCount, outputCount);
+                        Ann ann = new Ann(inputCount, outputCount);
+                        double error = CalculateError(ann, inputs, expectedOutputs);
+                        ann.Error = error;
+                        ann.Generation = generationId + 1;
+                        generation[startingIndividual] = ann;
                     }
                 }
                 else
@@ -44,20 +48,18 @@ namespace NeatLib
 
                     for (int newIndividual = 0; newIndividual < generationSize; newIndividual++)
                     {
+                        generation = generation.OrderBy(x => x.Error).Reverse().ToArray();
                         Ann child = crossoverOperation.Invoke(parentA, parentB);
                         Mutations.RollToCauseRandomMutation(child, mutationRate, mutationRolls);
-                        generation[newIndividual] = child;
+                        double error = CalculateError(child, inputs, expectedOutputs);
+                        child.Error = error;
+                        child.Generation = generationId + 1;
+
+                        if(child.Error < generation[0].Error)
+                            generation[0] = child;
                     }
                 }
 
-                for (int individual = 0; individual < generationSize; individual++)
-                {
-                    Ann ann = generation[individual];
-                    double[] outputs = ann.Execute(inputs);
-                    double error = CalculateError(ann, outputs, expectedOutputs);
-                    ann.Error = error;
-                    ann.Generation = generationId + 1;
-                }
                 generation = generation.OrderBy(x => x.Error).ToArray();
 
                 if(waitForFlag)
@@ -80,16 +82,18 @@ namespace NeatLib
             return generation[0];
         }
 
-        public double CalculateError(Ann ann, double[] actualOutputs, double[] expectedOutputs)
+        public double CalculateError(Ann ann, double[] inputs, double[] expectedOutputs)
         {
-            if (expectedOutputs.Length != actualOutputs.Length)
+            double[] outputs = ann.Execute(inputs);
+
+            if (expectedOutputs.Length != outputs.Length)
                 throw new ArgumentOutOfRangeException("The number of expected outputs must match the number of actual outputs.");
 
             double error = 0;
 
             for (int i = 0; i < expectedOutputs.Length; i++)
             {
-                error += Math.Sqrt(Math.Pow(expectedOutputs[i] - actualOutputs[i], 2));
+                error += Math.Sqrt(Math.Pow(expectedOutputs[i] - outputs[i], 2));
             }
 
             for (int i = 0; i < ann.hiddenNeurons.Count + ann.synapses.Count; i++)

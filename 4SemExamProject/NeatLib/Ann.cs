@@ -163,20 +163,5 @@ namespace NeatLib
             }
             return new Neuron[0];
         }
-
-        //public static Ann CreateOffspring(Ann parentA, Ann parentB, int mutationRate, int mutationRolls)
-        //{
-        //    bool parentRoll = Util.rand.Next(2) == 0;
-
-        //    Ann primaryAnn = parentRoll ? parentA : parentB;
-        //    Ann secondaryAnn = parentRoll ? parentB : parentA;
-
-        //    Ann child = Util.CloneAnn(primaryAnn);
-
-        //    //child.synapses.AddRange(Util.CloneDendrites(primaryParent ? parentB.synapses : parentA.synapses));
-
-        //    Mutations.RollToCauseRandomMutation(child, mutationRate, mutationRolls);
-        //    return child;
-        //}
     }
 }

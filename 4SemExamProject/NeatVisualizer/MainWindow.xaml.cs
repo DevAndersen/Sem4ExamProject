@@ -100,6 +100,8 @@ namespace NeatVisualizer
             }
         }
 
+        #region Draw
+
         private void DrawAnn(Ann ann)
         {
             Dispatcher.Invoke(() =>
@@ -244,5 +246,7 @@ namespace NeatVisualizer
             INPUT,
             OUTPUT
         }
+
+        #endregion
     }
 }

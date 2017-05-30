@@ -30,7 +30,6 @@ namespace NeatLib
 
             for (int generationId = 0; generationId < maxGenerations; generationId++)
             {
-                //Console.WriteLine("Generation: " + generationId);
                 if(generationId == 0)
                 {
                     for (int startingIndividual = 0; startingIndividual < generationSize; startingIndividual++)
@@ -45,9 +44,6 @@ namespace NeatLib
 
                     for (int newIndividual = 0; newIndividual < generationSize; newIndividual++)
                     {
-                        //generation[newIndividual] = Ann.CreateOffspring(parentA, parentB, 2, 1);
-                        //generation[newIndividual] = Util.CloneAnn(parentA);
-                        //Ann.RollToCauseRandomMutation(generation[newIndividual], 2, 1);
                         Ann child = crossoverOperation.Invoke(parentA, parentB);
                         Mutations.RollToCauseRandomMutation(child, mutationRate, mutationRolls);
                         generation[newIndividual] = child;

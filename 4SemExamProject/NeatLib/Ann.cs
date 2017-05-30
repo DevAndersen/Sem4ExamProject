@@ -31,6 +31,11 @@ namespace NeatLib
             if (inputs.Length != inputNeurons.Length)
                 throw new ArgumentOutOfRangeException("The number of inputs must match the number of input neurons.");
 
+            foreach (Neuron neuron in GetAllNeurons())
+            {
+                neuron.Value = 0;
+            }
+
             for (int i = 0; i < inputs.Length; i++)
             {
                 inputNeurons[i].Value = inputs[i];

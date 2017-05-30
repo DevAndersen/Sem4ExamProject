@@ -17,16 +17,6 @@ namespace NeatLib
             return ObjectCloner<Ann>.CloneObject(ann);
         }
 
-        //public static List<Neuron> CloneNeurons(List<Neuron> neurons)
-        //{
-        //    return ObjectCloner<List<Neuron>>.CloneObject(neurons);
-        //}
-
-        //public static List<Synapse> CloneDendrites(List<Synapse> Synapses)
-        //{
-        //    return ObjectCloner<List<Synapse>>.CloneObject(Synapses);
-        //}
-
         private static class ObjectCloner<T>
         {
             public static T CloneObject(T objectToClone)

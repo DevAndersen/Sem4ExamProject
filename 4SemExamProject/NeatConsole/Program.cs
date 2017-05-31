@@ -30,7 +30,7 @@ namespace NeatConsole
                 new double[] { 2, 4 }
             };
 
-            Neat neat = new Neat(2, 2);
+            Neat neat = new Neat();
             neat.OnGenerationEnd += (a) =>
             {
                 Console.WriteLine(">  Gen " + a.Generation + "\tErr: " + a.Error);

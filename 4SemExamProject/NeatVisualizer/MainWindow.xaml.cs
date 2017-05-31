@@ -31,7 +31,8 @@ namespace NeatVisualizer
                 BtnExecute,
                 CbAnimate,
                 TbInputs,
-                TbOutputs
+                TbOutputs,
+                TbDelay
             };
         }
 
@@ -51,6 +52,7 @@ namespace NeatVisualizer
 
             int inputCount = 2;
             int outputCount = 1;
+            int delay = 150;
 
             Dispatcher.Invoke(() =>
             {
@@ -62,15 +64,17 @@ namespace NeatVisualizer
 
                 inputCount = int.TryParse(TbInputs.Text, out inputCount) ? inputCount : 2;
                 outputCount = int.TryParse(TbOutputs.Text, out outputCount) ? outputCount : 1;
+                delay = int.TryParse(TbDelay.Text, out delay) ? delay : 150;
             });
 
-            Neat neat = new Neat(inputCount, outputCount);
+            Neat neat = new Neat();
 
             neat.OnGenerationEnd += (a) =>
             {
                 if (wait)
                 {
                     DrawAnn(a);
+                    Thread.Sleep(delay);
                 }
                 neat.LowerWaitFlag();
             };
@@ -85,7 +89,7 @@ namespace NeatVisualizer
                 new double[] { 2, 4 }
             };
 
-            Ann ann = neat.Train(100, 1000, 0.05, 3, 30, wait, inputs, expectedOutputs, Crossover.TwoPointCrossover);
+            Ann ann = neat.Train(100, 100, 0.05, 3, 30, wait, inputs, expectedOutputs, Crossover.TwoPointCrossover);
 
             Dispatcher.Invoke(() =>
             {

@@ -15,18 +15,16 @@ namespace NeatLib
 
         private bool waitFlag = false;
 
-        private int inputCount;
-        private int outputCount;
-
-        public Neat(int InputCount, int OutputCount)
+        public Neat()
         {
-            inputCount = InputCount;
-            outputCount = OutputCount;
+
         }
 
         public Ann Train(int maxGenerations, int generationSize, double? errorThreshold, int mutationRate, int mutationRolls, bool waitForFlag, double[][] inputs, double[][] expectedOutputs, Crossover.CrossoverOperation crossoverOperation)
         {
             Ann[] generation = new Ann[generationSize];
+            int inputCount = inputs[0].Length;
+            int outputCount = expectedOutputs[0].Length;
 
             for (int generationId = 0; generationId < maxGenerations; generationId++)
             {
@@ -62,7 +60,6 @@ namespace NeatLib
                 generation.ToList().ForEach(x =>
                 {
                     x.Error = CalculateError(x, inputs, expectedOutputs);
-
                     x.Generation = generationId;
                 });
 

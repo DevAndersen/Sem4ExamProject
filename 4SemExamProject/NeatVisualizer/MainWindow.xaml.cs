@@ -66,7 +66,7 @@ namespace NeatVisualizer
 
             Neat neat = new Neat(inputCount, outputCount);
 
-            neat.OnGenerationEnd += (a, g) =>
+            neat.OnGenerationEnd += (a) =>
             {
                 if (wait)
                 {
@@ -75,17 +75,15 @@ namespace NeatVisualizer
                 neat.LowerWaitFlag();
             };
 
-            double[] inputs = new double[inputCount];
-            for (int i = 0; i < inputCount; i++)
+            double[][] inputs = new double[][]
             {
-                inputs[i] = 1;
-            }
+                new double[] { 1, 1 }
+            };
 
-            double[] expectedOutputs = new double[outputCount];
-            for (int i = 0; i < outputCount; i++)
+            double[][] expectedOutputs = new double[][]
             {
-                expectedOutputs[i] = 1;
-            }
+                new double[] { 2, 4 }
+            };
 
             Ann ann = neat.Train(100, 1000, 0.05, 3, 30, wait, inputs, expectedOutputs, Crossover.TwoPointCrossover);
 

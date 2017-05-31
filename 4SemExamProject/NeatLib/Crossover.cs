@@ -14,8 +14,8 @@ namespace NeatLib
         {
             bool parentRoll = Util.rand.Next(2) == 0;
 
-            Ann primaryAnn = parentRoll ? parentA : parentB;
-            Ann secondaryAnn = parentRoll ? parentB : parentA;
+            Ann primaryAnn = Util.CloneAnn(parentRoll ? parentA : parentB);
+            Ann secondaryAnn = Util.CloneAnn(parentRoll ? parentB : parentA);
             Ann child = Util.CloneAnn(primaryAnn);
             child.hiddenNeurons.Clear();
             child.synapses.Clear();

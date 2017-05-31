@@ -10,7 +10,7 @@ namespace NeatLib
     {
         private const double ErrorPerPart = 0.0;
         
-        public delegate void AnnEventHandler(Ann ann, int generation);
+        public delegate void AnnEventHandler(Ann ann);
         public event AnnEventHandler OnGenerationEnd;
 
         private bool waitFlag = false;
@@ -24,7 +24,7 @@ namespace NeatLib
             outputCount = OutputCount;
         }
 
-        public Ann Train(int maxGenerations, int generationSize, double? errorThreshold, int mutationRate, int mutationRolls, bool waitForFlag, double[] inputs, double[] expectedOutputs, Crossover.CrossoverOperation crossoverOperation)
+        public Ann Train(int maxGenerations, int generationSize, double? errorThreshold, int mutationRate, int mutationRolls, bool waitForFlag, double[][] inputs, double[][] expectedOutputs, Crossover.CrossoverOperation crossoverOperation)
         {
             Ann[] generation = new Ann[generationSize];
 
@@ -37,7 +37,6 @@ namespace NeatLib
                         Ann ann = new Ann(inputCount, outputCount);
                         double error = CalculateError(ann, inputs, expectedOutputs);
                         ann.Error = error;
-                        ann.Generation = generationId + 1;
                         generation[startingIndividual] = ann;
                     }
                 }
@@ -48,24 +47,31 @@ namespace NeatLib
 
                     for (int newIndividual = 0; newIndividual < generationSize; newIndividual++)
                     {
-                        generation = generation.OrderBy(x => x.Error).Reverse().ToArray();
+                        generation = generation.OrderByDescending(x => x.Error).ToArray();
+
                         Ann child = crossoverOperation.Invoke(parentA, parentB);
                         Mutations.RollToCauseRandomMutation(child, mutationRate, mutationRolls);
                         double error = CalculateError(child, inputs, expectedOutputs);
                         child.Error = error;
-                        child.Generation = generationId + 1;
 
                         if(child.Error < generation[0].Error)
                             generation[0] = child;
                     }
                 }
 
+                generation.ToList().ForEach(x =>
+                {
+                    x.Error = CalculateError(x, inputs, expectedOutputs);
+
+                    x.Generation = generationId;
+                });
+
                 generation = generation.OrderBy(x => x.Error).ToArray();
 
                 if(waitForFlag)
                 {
                     waitFlag = true;
-                    OnGenerationEnd?.Invoke(generation[0], generationId);
+                    OnGenerationEnd?.Invoke(generation[0]);
                     while (waitFlag)
                     {
 
@@ -73,7 +79,7 @@ namespace NeatLib
                 }
                 else
                 {
-                    OnGenerationEnd?.Invoke(generation[0], generationId);
+                    OnGenerationEnd?.Invoke(generation[0]);
                 }
 
                 if (errorThreshold != null && generation[0].Error < errorThreshold)
@@ -82,23 +88,26 @@ namespace NeatLib
             return generation[0];
         }
 
-        public double CalculateError(Ann ann, double[] inputs, double[] expectedOutputs)
+        public double CalculateError(Ann ann, double[][] inputs, double[][] expectedOutputs, bool debugFlag = false)
         {
-            double[] outputs = ann.Execute(inputs);
-
-            if (expectedOutputs.Length != outputs.Length)
-                throw new ArgumentOutOfRangeException("The number of expected outputs must match the number of actual outputs.");
-
             double error = 0;
 
-            for (int i = 0; i < expectedOutputs.Length; i++)
+            for (int inputIndex = 0; inputIndex < inputs.Length; inputIndex++)
             {
-                error += Math.Sqrt(Math.Pow(expectedOutputs[i] - outputs[i], 2));
-            }
+                double[] currentInputs = inputs[inputIndex];
+                double[] currentExpectedOutputs = expectedOutputs[inputIndex];
 
-            for (int i = 0; i < ann.hiddenNeurons.Count + ann.synapses.Count; i++)
-            {
-                error += ErrorPerPart;
+                double[] outputs = ann.Execute(currentInputs);
+
+                for (int i = 0; i < currentExpectedOutputs.Length; i++)
+                {
+                    error += Math.Sqrt(Math.Pow(currentExpectedOutputs[i] - outputs[i], 2));
+                }
+
+                for (int i = 0; i < ann.hiddenNeurons.Count + ann.synapses.Count; i++)
+                {
+                    error += ErrorPerPart;
+                }
             }
 
             return error;

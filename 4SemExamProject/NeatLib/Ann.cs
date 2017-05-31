@@ -17,10 +17,14 @@ namespace NeatLib
         public List<Neuron> hiddenNeurons = new List<Neuron>();
         public List<Synapse> synapses = new List<Synapse>();
 
-        public Ann(int inputs, int outputs)
+        private ActivationFunction.ActivationMethod activationMethod;
+
+        public Ann(int inputs, int outputs, ActivationFunction.ActivationMethod activationMethod)
         {
             if (inputs < 1 || outputs < 1)
                 throw new ArgumentOutOfRangeException("There must be at least one input and one output.");
+
+            this.activationMethod = activationMethod;
 
             InitNeurons(inputs, outputs);
             InitSynapses();
@@ -60,8 +64,8 @@ namespace NeatLib
                             value += connectedNeuron.Value * synapseFromneuron.Weight;
                         }
                     }
-
-                    neuron.Value = value + neuron.Bias;
+                    
+                    neuron.Value = activationMethod.Invoke(value + neuron.Bias);
                 }
             }
 

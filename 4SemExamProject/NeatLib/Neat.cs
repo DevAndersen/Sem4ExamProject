@@ -20,7 +20,7 @@ namespace NeatLib
 
         }
 
-        public Ann Train(int maxGenerations, int generationSize, double? errorThreshold, int mutationRate, int mutationRolls, bool waitForFlag, double[][] inputs, double[][] expectedOutputs, Crossover.CrossoverOperation crossoverOperation)
+        public Ann Train(int maxGenerations, int generationSize, double? errorThreshold, int mutationRate, int mutationRolls, bool waitForFlag, double[][] inputs, double[][] expectedOutputs, Crossover.CrossoverOperation crossoverOperation, ActivationFunction.ActivationMethod activationMethod)
         {
             Ann[] generation = new Ann[generationSize];
             int inputCount = inputs[0].Length;
@@ -32,7 +32,7 @@ namespace NeatLib
                 {
                     for (int startingIndividual = 0; startingIndividual < generationSize; startingIndividual++)
                     {
-                        Ann ann = new Ann(inputCount, outputCount);
+                        Ann ann = new Ann(inputCount, outputCount, activationMethod);
                         double error = CalculateError(ann, inputs, expectedOutputs);
                         ann.Error = error;
                         generation[startingIndividual] = ann;

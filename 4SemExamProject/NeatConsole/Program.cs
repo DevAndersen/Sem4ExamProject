@@ -36,7 +36,7 @@ namespace NeatConsole
                 Console.WriteLine(">  Gen " + a.Generation + "\tErr: " + a.Error);
             };
 
-            Ann ann = neat.Train(1000, 100, 0.03, 3, 30, false, inputs, expectedOutputs, Crossover.TwoPointCrossover);
+            Ann ann = neat.Train(1000, 100, 0.03, 3, 30, false, inputs, expectedOutputs, Crossover.TwoPointCrossover, ActivationFunction.Identity);
             
             double finalError = neat.CalculateError(ann, inputs, expectedOutputs);
             Console.WriteLine("Final error: " + finalError);

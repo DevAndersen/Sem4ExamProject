@@ -89,7 +89,22 @@ namespace NeatVisualizer
                 new double[] { 2, 4 }
             };
 
-            Ann ann = neat.Train(100, 100, 0.05, 3, 30, wait, inputs, expectedOutputs, Crossover.TwoPointCrossover);
+            inputs = new double[][]
+            {
+                new double[] { 0, 0 },
+                new double[] { 0, 1 },
+                new double[] { 1, 0 },
+                new double[] { 1, 1 },
+            };
+            expectedOutputs = new double[][]
+            {
+                new double[] { 0 },
+                new double[] { 1 },
+                new double[] { 1 },
+                new double[] { 0 },
+            };
+
+            Ann ann = neat.Train(10000, 100, 0.1, 3, 30, wait, inputs, expectedOutputs, Crossover.TwoPointCrossover, ActivationFunction.Sigmoid);
 
             Dispatcher.Invoke(() =>
             {

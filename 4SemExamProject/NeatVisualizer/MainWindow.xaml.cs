@@ -118,6 +118,13 @@ namespace NeatVisualizer
                         TBNeuronData.Text += "Bias: " + x.Bias + "\n";
                         TBNeuronData.Text += "\n";
                     });
+
+                    TBOutputNeurons.Clear();
+                    a.outputNeurons.ToList().ForEach(x =>
+                    {
+                        TBOutputNeurons.Text += "Value: " + x.Value + "\n";
+                        TBOutputNeurons.Text += "\n";
+                    });
                 });
                 if (wait)
                 {
@@ -133,30 +140,40 @@ namespace NeatVisualizer
 
             double[][] inputs = new double[][]
             {
-                new double[] { 1, 1 }
+                new double[] { 1 }
             };
 
             double[][] expectedOutputs = new double[][]
             {
-                new double[] { 2, 4 }
+                new double[] { 2 }
             };
 
             inputs = new double[][]
             {
-                new double[] { 0, 0 },
-                new double[] { 0, 1 },
-                new double[] { 1, 0 },
-                new double[] { 1, 1 },
-            };
-            expectedOutputs = new double[][]
-            {
-                new double[] { 0 },
-                new double[] { 1 },
-                new double[] { 1 },
-                new double[] { 0 },
+                new double[] { 10 }
             };
 
-            Ann ann = neat.Train(10000, 100, 0.1, 3, 30, wait, inputs, expectedOutputs, Crossover.TwoPointCrossover, ActivationFunction.Sigmoid);
+            expectedOutputs = new double[][]
+            {
+                new double[] { 20, 40, 60 }
+            };
+
+            //inputs = new double[][]
+            //{
+            //    new double[] { 0, 0 },
+            //    new double[] { 0, 1 },
+            //    new double[] { 1, 0 },
+            //    new double[] { 1, 1 },
+            //};
+            //expectedOutputs = new double[][]
+            //{
+            //    new double[] { 0 },
+            //    new double[] { 1 },
+            //    new double[] { 1 },
+            //    new double[] { 0 },
+            //};
+
+            Ann ann = neat.Train(10000, 100, 0.1, 3, 30, wait, inputs, expectedOutputs, Crossover.TwoPointCrossover, ActivationFunction.Identity);
 
             Dispatcher.Invoke(() =>
             {

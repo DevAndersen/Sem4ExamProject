@@ -13,14 +13,16 @@ namespace NeatLib
         private static List<MutationMethod> mutationChances = new List<MutationMethod>()
         {
             MutateSynapseAddRandom,
-            MutateSynapseWeight,
+            MutateSynapseWeightRandomize,
+            MutateSynapseWeightIncreaseRandom,
+            MutateSynapseWeightDecreaseRandom,
             MutateSynapseFromLayer,
             MutateSynapseFromNeuron,
             MutateSynapseToLayer,
             MutateSynapseToNeuron,
             MutateSynapseRemoveRandom,
             MutateNeuronAddRandom,
-            MutateNeuronBias,
+            MutateNeuronBiasRandomize,
             MutateNeuronNeuronIdPush,
             MutateNeuronLayerRandomExisting,
             MutateNeuronLayerPush,
@@ -37,6 +39,7 @@ namespace NeatLib
                 }
             }
             HelperCleanUpDuplicates(ann);
+            HelperCleanUpBackwardsSynapses(ann);
         }
 
         #region Synapse mutations
@@ -60,12 +63,28 @@ namespace NeatLib
             }
         }
 
-        private static void MutateSynapseWeight(Ann ann)
+        private static void MutateSynapseWeightRandomize(Ann ann)
         {
             if (ann.synapses.Count == 0)
                 return;
 
             ann.synapses[Util.rand.Next(ann.synapses.Count)].Weight = Util.rand.NextDouble();
+        }
+
+        private static void MutateSynapseWeightIncreaseRandom(Ann ann)
+        {
+            if (ann.synapses.Count == 0)
+                return;
+
+            ann.synapses[Util.rand.Next(ann.synapses.Count)].Weight += Util.rand.NextDouble();
+        }
+
+        private static void MutateSynapseWeightDecreaseRandom(Ann ann)
+        {
+            if (ann.synapses.Count == 0)
+                return;
+
+            ann.synapses[Util.rand.Next(ann.synapses.Count)].Weight -= Util.rand.NextDouble();
         }
 
         private static void MutateSynapseFromLayer(Ann ann)
@@ -168,7 +187,7 @@ namespace NeatLib
             }
         }
 
-        private static void MutateNeuronBias(Ann ann)
+        private static void MutateNeuronBiasRandomize(Ann ann)
         {
             ann.GetAllNeurons()[Util.rand.Next(ann.GetAllNeurons().Count)].Bias = Util.rand.NextDouble();
         }
@@ -312,6 +331,21 @@ namespace NeatLib
 
             ann.synapses = synapseCheckList;
             ann.hiddenNeurons = neuronCheckList;
+        }
+
+        private static void HelperCleanUpBackwardsSynapses(Ann ann)
+        {
+            List<Synapse> synapseChecklist = new List<Synapse>();
+
+            foreach (Synapse synapse in ann.synapses)
+            {
+                if(synapse.FromLayer != -2 && (synapse.FromLayer == -1 || synapse.FromLayer < synapse.ToLayer))
+                {
+                    synapseChecklist.Add(synapse);
+                }
+            }
+
+            ann.synapses = synapseChecklist;
         }
 
         #endregion

@@ -16,7 +16,7 @@
             <Button Name="BtnPause" Padding="4" IsEnabled="False" Click="BtnPause_Click">Pause</Button>
             <CheckBox Name="CbAnimate" IsChecked="True">Animate</CheckBox>
             <Label Margin="16,0,0,0">Delay:</Label>
-            <TextBox Name="TbDelay" Width="40" TextAlignment="Right">150</TextBox>
+            <TextBox Name="TbDelay" Width="40" TextAlignment="Right">0</TextBox>
 
             <Separator Background="Gray"/>
 
@@ -44,6 +44,9 @@
                 </TabItem>
                 <TabItem Header="Synapses">
                     <TextBox Name="TBSynapseData" IsReadOnly="True" TextWrapping="NoWrap" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto"/>
+                </TabItem>
+                <TabItem Header="Outputs">
+                    <TextBox Name="TBOutputNeurons" IsReadOnly="True" TextWrapping="NoWrap" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto"/>
                 </TabItem>
             </TabControl>
             <GridSplitter Grid.Column="1" Width="5" HorizontalAlignment="Stretch"/>

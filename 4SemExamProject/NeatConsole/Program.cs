@@ -12,7 +12,6 @@ namespace NeatConsole
         static void Main(string[] args)
         {
             new Program().Run();
-
             Console.ForegroundColor = ConsoleColor.Green;
             Console.WriteLine("\nDONE");
             Console.ReadLine();
@@ -22,12 +21,22 @@ namespace NeatConsole
         {
             double[][] inputs = new double[][]
             {
-                new double[] { 1, 1 }
+                new double[] { 10 }
             };
 
             double[][] expectedOutputs = new double[][]
             {
                 new double[] { 2, 4 }
+            };
+
+            inputs = new double[][]
+            {
+                new double[] { 10, 10 }
+            };
+
+            expectedOutputs = new double[][]
+            {
+                new double[] { 20, 40, 60 }
             };
 
             Neat neat = new Neat();
@@ -41,7 +50,7 @@ namespace NeatConsole
             double finalError = neat.CalculateError(ann, inputs, expectedOutputs);
             Console.WriteLine("Final error: " + finalError);
 
-            double[] result = ann.Execute(inputs[0]);
+            double[] result = ann.Execute(new double[] { 5, 5 });
             for (int i = 0; i < result.Length; i++)
             {
                 Console.WriteLine($"Result {i}: {result[i]}");

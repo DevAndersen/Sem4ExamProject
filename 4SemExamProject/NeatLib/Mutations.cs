@@ -24,7 +24,7 @@ namespace NeatLib
             MutateNeuronNeuronIdPush,
             MutateNeuronLayerRandomExisting,
             MutateNeuronLayerPush,
-            MutateNeuronRemoveRandom,
+            MutateNeuronRemoveRandom
         };
 
         public static void RollToCauseRandomMutation(Ann ann, int mutationRate, int mutationRolls)
@@ -36,6 +36,7 @@ namespace NeatLib
                     mutationChances[Util.rand.Next(mutationChances.Count)].Invoke(ann);
                 }
             }
+            HelperCleanUpDuplicates(ann);
         }
 
         #region Synapse mutations
@@ -52,7 +53,8 @@ namespace NeatLib
             int toLayer = layers.Length != 0 ? layers[Util.rand.Next(layers.Length)] : 0;
             int[] toNeuronPositions = ann.GetNeuronsForLayer(toLayer).Select(x => x.NeuronPosition).ToArray();
             int toNeuron = toNeuronPositions[Util.rand.Next(toNeuronPositions.Length)];
-            if(toLayer != fromLayer)
+
+            if(toLayer != fromLayer && !HelperDoesSynapseExist(ann, fromLayer, fromNeuron, toLayer, toNeuron))
             {
                 ann.synapses.Add(new Synapse(fromLayer, fromNeuron, toLayer, toNeuron));
             }
@@ -74,7 +76,7 @@ namespace NeatLib
             Synapse synapse = ann.synapses[Util.rand.Next(ann.synapses.Count)];
             int layer = ann.GetAllLayers()[Util.rand.Next(ann.GetAllLayers().Length)];
 
-            if(synapse.ToLayer != layer)
+            if(synapse.ToLayer != layer && !HelperDoesSynapseExist(ann, layer, synapse.FromNeuron, synapse.ToLayer, synapse.ToNeuron))
             {
                 synapse.FromLayer = layer;
             }
@@ -90,7 +92,10 @@ namespace NeatLib
             Neuron[] neuronsInLayer = ann.GetNeuronsForLayer(fromLayer);
             Neuron neuron = neuronsInLayer.Length != 0 ? neuronsInLayer[Util.rand.Next(neuronsInLayer.Length)] : null;
             int newNeuronPosition = neuron != null ? neuron.NeuronPosition : 0;
-            synapse.FromNeuron = newNeuronPosition;
+            if (!HelperDoesSynapseExist(ann, synapse.FromLayer, newNeuronPosition, synapse.ToLayer, synapse.ToNeuron))
+            {
+                synapse.FromNeuron = newNeuronPosition;
+            }
         }
 
         private static void MutateSynapseToLayer(Ann ann)
@@ -104,7 +109,7 @@ namespace NeatLib
             Synapse synapse = ann.synapses[Util.rand.Next(ann.synapses.Count)];
             int layer = ann.GetAllLayers()[Util.rand.Next(ann.GetAllLayers().Length)];
 
-            if (synapse.FromLayer != layer)
+            if (synapse.FromLayer != layer && !HelperDoesSynapseExist(ann, synapse.FromLayer, synapse.FromNeuron, synapse.ToLayer, layer))
             {
                 synapse.ToLayer = layer;
             }
@@ -120,7 +125,10 @@ namespace NeatLib
             Neuron[] neuronsInLayer = ann.GetNeuronsForLayer(toLayer);
             Neuron neuron = neuronsInLayer.Length != 0 ? neuronsInLayer[Util.rand.Next(neuronsInLayer.Length)] : null;
             int newNeuronPosition = neuron != null ? neuron.NeuronPosition : 0;
-            synapse.ToNeuron = newNeuronPosition;
+            if (!HelperDoesSynapseExist(ann, synapse.FromLayer, synapse.FromNeuron, synapse.ToLayer, newNeuronPosition))
+            {
+                synapse.ToNeuron = newNeuronPosition;
+            }
         }
 
         private static void MutateSynapseRemoveRandom(Ann ann)
@@ -153,7 +161,11 @@ namespace NeatLib
                     keepSearching = false;
                 }
             }
-            ann.hiddenNeurons.Add(new Neuron(layer, neuronId));
+
+            if(!HelperDoesNeuronExist(ann, layer, neuronId))
+            {
+                ann.hiddenNeurons.Add(new Neuron(layer, neuronId));
+            }
         }
 
         private static void MutateNeuronBias(Ann ann)
@@ -171,7 +183,7 @@ namespace NeatLib
             {
                 int push = Util.rand.Next(2) == 0 ? 1 : -1;
                 Neuron neuron = ann.hiddenNeurons[Util.rand.Next(ann.hiddenNeurons.Count)];
-                if (neuron.NeuronPosition + push >= 0)
+                if (neuron.NeuronPosition + push >= 0 && !HelperDoesNeuronExist(ann, neuron.Layer, neuron.NeuronPosition + push))
                 {
                     neuron.NeuronPosition += push;
                     working = false;
@@ -186,7 +198,11 @@ namespace NeatLib
 
             int[] layers = ann.GetHiddenLayers();
             int randomLayer = layers[Util.rand.Next(layers.Length)];
-            ann.hiddenNeurons[Util.rand.Next(ann.hiddenNeurons.Count)].Layer = randomLayer;
+            Neuron neuron = ann.hiddenNeurons[Util.rand.Next(ann.hiddenNeurons.Count)];
+            if(!HelperDoesNeuronExist(ann, randomLayer, neuron.NeuronPosition))
+            {
+                neuron.Layer = randomLayer;
+            }
         }
 
         private static void MutateNeuronLayerPush(Ann ann)
@@ -199,7 +215,7 @@ namespace NeatLib
             {
                 int push = Util.rand.Next(2) == 0 ? 1 : -1;
                 Neuron neuron = ann.hiddenNeurons[Util.rand.Next(ann.hiddenNeurons.Count)];
-                if(neuron.Layer + push >= 0)
+                if(neuron.Layer + push >= 0 && !HelperDoesNeuronExist(ann, neuron.Layer + push, neuron.NeuronPosition))
                 {
                     neuron.Layer += push;
                     working = false;
@@ -213,6 +229,89 @@ namespace NeatLib
                 return;
 
             ann.hiddenNeurons.RemoveAt(Util.rand.Next(ann.hiddenNeurons.Count));
+        }
+
+        #endregion
+
+        #region Helper methods
+
+        private static bool HelperDoesSynapseExist(Ann ann, int fromLayer, int fromNeuron, int toLayer, int toNeuron)
+        {
+            bool exists = ann.synapses.Where(x =>
+            x.FromLayer == fromLayer &&
+            x.FromNeuron == fromNeuron &&
+            x.ToLayer == toLayer &&
+            x.ToNeuron == toNeuron
+            ).ToArray().Length != 0;
+
+            bool existsReversed = ann.synapses.Where(x =>
+            x.FromLayer == toLayer &&
+            x.FromNeuron == toNeuron &&
+            x.ToLayer == fromLayer &&
+            x.ToNeuron == fromNeuron
+            ).ToArray().Length != 0;
+
+            return exists || existsReversed;
+        }
+
+        private static bool HelperDoesNeuronExist(Ann ann, int layer, int neuronPosition)
+        {
+            return ann.hiddenNeurons.Where(x =>
+            x.Layer == layer &&
+            x.NeuronPosition == neuronPosition
+            ).ToArray().Length != 0;
+        }
+
+        private static void HelperCleanUpDuplicates(Ann ann)
+        {
+            //Synapse[] shuffledSynapses = ann.synapses.OrderBy(elem => Guid.NewGuid()).ToArray();
+            //Neuron[] shuffledNeurons = ann.hiddenNeurons.OrderBy(elem => Guid.NewGuid()).ToArray();
+
+            //throw new NotImplementedException("Remove duplicate synapses and neurons.");
+
+            List<Synapse> synapseCheckList = new List<Synapse>();
+            List<Neuron> neuronCheckList = new List<Neuron>();
+
+            foreach (Synapse synapse in ann.synapses)
+            {
+                bool foundOnChecklist = false;
+                foreach (Synapse synapseFromCheckList in synapseCheckList)
+                {
+                    if(synapse.FromLayer == synapseFromCheckList.FromLayer &&
+                       synapse.FromNeuron == synapseFromCheckList.FromNeuron &&
+                       synapse.ToLayer == synapseFromCheckList.ToLayer &&
+                       synapse.ToNeuron == synapseFromCheckList.ToNeuron)
+                    {
+                        foundOnChecklist = true;
+                    }
+                }
+
+                if(!foundOnChecklist)
+                {
+                    synapseCheckList.Add(synapse);
+                }
+            }
+
+            foreach (Neuron neuron in ann.hiddenNeurons)
+            {
+                bool foundOnChecklist = false;
+                foreach (Neuron neuronFromCheckList in neuronCheckList)
+                {
+                    if (neuron.Layer == neuronFromCheckList.Layer &&
+                        neuron.NeuronPosition == neuronFromCheckList.NeuronPosition)
+                    {
+                        foundOnChecklist = true;
+                    }
+                }
+
+                if (!foundOnChecklist)
+                {
+                    neuronCheckList.Add(neuron);
+                }
+            }
+
+            ann.synapses = synapseCheckList;
+            ann.hiddenNeurons = neuronCheckList;
         }
 
         #endregion

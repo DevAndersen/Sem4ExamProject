@@ -20,7 +20,9 @@ namespace NeatVisualizer
     public partial class MainWindow : Window
     {
         List<Control> controlsToDisable;
+        List<Control> controlsToEnable;
         Thread executionThread;
+        bool pause = false;
 
         public MainWindow()
         {
@@ -34,16 +36,35 @@ namespace NeatVisualizer
                 TbOutputs,
                 TbDelay
             };
+
+            controlsToEnable = new List<Control>()
+            {
+                BtnPause
+            };
         }
 
         private void BtnExecute_Click(object sender, RoutedEventArgs e)
         {
-            BackgroundGrid.Background = new SolidColorBrush(Color.FromRgb(75, 75, 75));
+            SVCanvas.Background = new SolidColorBrush(Color.FromRgb(75, 75, 75));
             executionThread = new Thread(() =>
             {
                 ExecuteNeat();
             });
             executionThread.Start();
+        }
+
+        private void BtnPause_Click(object sender, RoutedEventArgs e)
+        {
+            if(executionThread != null && executionThread.IsAlive)
+            {
+                pause = !pause;
+                BtnPause.Content = pause ? "Unpause" : "Pause";
+            }
+        }
+
+        private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
+        {
+            executionThread?.Abort();
         }
 
         private void ExecuteNeat()
@@ -57,6 +78,7 @@ namespace NeatVisualizer
             Dispatcher.Invoke(() =>
             {
                 controlsToDisable.ForEach(x => x.IsEnabled = false);
+                controlsToEnable.ForEach(x => x.IsEnabled = true);
                 if (CbAnimate.IsChecked == true)
                 {
                     wait = true;
@@ -71,10 +93,36 @@ namespace NeatVisualizer
 
             neat.OnGenerationEnd += (a) =>
             {
+                Dispatcher.Invoke(() =>
+                {
+                    TBSynapseData.Clear();
+                    a.synapses.ForEach(x =>
+                    {
+                        TBSynapseData.Text += "FromLayer: " + x.FromLayer + "\n";
+                        TBSynapseData.Text += "Fromneuron: " + x.FromNeuron + "\n";
+                        TBSynapseData.Text += "ToLayer: " + x.ToLayer + "\n";
+                        TBSynapseData.Text += "ToNeuron: " + x.ToNeuron + "\n";
+                        TBSynapseData.Text += "Weight: " + x.Weight + "\n";
+                        TBSynapseData.Text += "\n";
+                    });
+
+                    TBNeuronData.Clear();
+                    a.hiddenNeurons.ForEach(x =>
+                    {
+                        TBNeuronData.Text += "Layer: " + x.Layer + "\n";
+                        TBNeuronData.Text += "NeuronPosition: " + x.NeuronPosition + "\n";
+                        TBNeuronData.Text += "Bias: " + x.Bias + "\n";
+                        TBNeuronData.Text += "\n";
+                    });
+                });
                 if (wait)
                 {
                     DrawAnn(a);
                     Thread.Sleep(delay);
+                }
+                while(pause)
+                {
+
                 }
                 neat.LowerWaitFlag();
             };
@@ -109,7 +157,8 @@ namespace NeatVisualizer
             Dispatcher.Invoke(() =>
             {
                 controlsToDisable.ForEach(x => x.IsEnabled = true);
-                BackgroundGrid.Background = new SolidColorBrush(Colors.Gray);
+                controlsToEnable.ForEach(x => x.IsEnabled = false);
+                SVCanvas.Background = new SolidColorBrush(Colors.Gray);
             });
 
             if (!wait)
@@ -266,10 +315,5 @@ namespace NeatVisualizer
         }
 
         #endregion
-
-        private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
-        {
-            executionThread?.Abort();
-        }
     }
 }

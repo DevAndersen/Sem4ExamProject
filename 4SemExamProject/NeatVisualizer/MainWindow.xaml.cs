@@ -64,7 +64,11 @@ namespace NeatVisualizer
 
         private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
         {
-            executionThread?.Abort();
+            try
+            {
+                executionThread?.Abort();
+            }
+            catch { }
         }
 
         private void ExecuteNeat()
@@ -86,7 +90,7 @@ namespace NeatVisualizer
 
                 inputCount = int.TryParse(TbInputs.Text, out inputCount) ? inputCount : 2;
                 outputCount = int.TryParse(TbOutputs.Text, out outputCount) ? outputCount : 1;
-                delay = int.TryParse(TbDelay.Text, out delay) ? delay : 150;
+                delay = int.TryParse(TbDelay.Text, out delay) ? delay : 0;
             });
 
             Neat neat = new Neat();

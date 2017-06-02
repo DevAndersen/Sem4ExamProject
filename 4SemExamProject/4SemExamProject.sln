@@ -9,6 +9,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NeatVisualizer", "NeatVisua
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NeatConsole", "NeatConsole\NeatConsole.csproj", "{417ADA82-DA9B-45DF-B745-A821EEEC8570}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DatabaseNormalizer", "DatabaseNormalizer\DatabaseNormalizer.csproj", "{A3621B72-1014-42BC-B51A-EB39AF357263}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -27,6 +29,10 @@ Global
 		{417ADA82-DA9B-45DF-B745-A821EEEC8570}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{417ADA82-DA9B-45DF-B745-A821EEEC8570}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{417ADA82-DA9B-45DF-B745-A821EEEC8570}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A3621B72-1014-42BC-B51A-EB39AF357263}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A3621B72-1014-42BC-B51A-EB39AF357263}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A3621B72-1014-42BC-B51A-EB39AF357263}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A3621B72-1014-42BC-B51A-EB39AF357263}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

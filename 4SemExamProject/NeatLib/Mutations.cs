@@ -23,6 +23,8 @@ namespace NeatLib
             MutateSynapseRemoveRandom,
             MutateNeuronAddRandom,
             MutateNeuronBiasRandomize,
+            MutateNeuronBiasIncreaseRandom,
+            MutateNeuronBiasDecreaseRandom,
             MutateNeuronNeuronIdPush,
             MutateNeuronLayerRandomExisting,
             MutateNeuronLayerPush,
@@ -68,7 +70,7 @@ namespace NeatLib
             if (ann.synapses.Count == 0)
                 return;
 
-            ann.synapses[Util.rand.Next(ann.synapses.Count)].Weight = Util.rand.NextDouble();
+            ann.synapses[Util.rand.Next(ann.synapses.Count)].Weight = Util.rand.NextDouble() * 100;
         }
 
         private static void MutateSynapseWeightIncreaseRandom(Ann ann)
@@ -76,7 +78,7 @@ namespace NeatLib
             if (ann.synapses.Count == 0)
                 return;
 
-            ann.synapses[Util.rand.Next(ann.synapses.Count)].Weight += Util.rand.NextDouble();
+            ann.synapses[Util.rand.Next(ann.synapses.Count)].Weight += Util.rand.NextDouble() * 100;
         }
 
         private static void MutateSynapseWeightDecreaseRandom(Ann ann)
@@ -190,6 +192,16 @@ namespace NeatLib
         private static void MutateNeuronBiasRandomize(Ann ann)
         {
             ann.GetAllNeurons()[Util.rand.Next(ann.GetAllNeurons().Count)].Bias = Util.rand.NextDouble();
+        }
+
+        private static void MutateNeuronBiasIncreaseRandom(Ann ann)
+        {
+            ann.GetAllNeurons()[Util.rand.Next(ann.GetAllNeurons().Count)].Bias += Util.rand.NextDouble() * 100;
+        }
+
+        private static void MutateNeuronBiasDecreaseRandom(Ann ann)
+        {
+            ann.GetAllNeurons()[Util.rand.Next(ann.GetAllNeurons().Count)].Bias -= Util.rand.NextDouble() * 100;
         }
 
         private static void MutateNeuronNeuronIdPush(Ann ann)

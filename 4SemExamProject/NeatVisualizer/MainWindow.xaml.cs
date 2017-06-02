@@ -150,30 +150,22 @@ namespace NeatVisualizer
 
             inputs = new double[][]
             {
-                new double[] { 10 }
+                new double[] { 0, 0 },
+                new double[] { 0, 1 },
+                new double[] { 1, 0 },
+                new double[] { 1, 1 },
             };
-
             expectedOutputs = new double[][]
             {
-                new double[] { 20, 40, 60 }
+                new double[] { 0 },
+                new double[] { 1 },
+                new double[] { 1 },
+                new double[] { 0 },
             };
 
-            //inputs = new double[][]
-            //{
-            //    new double[] { 0, 0 },
-            //    new double[] { 0, 1 },
-            //    new double[] { 1, 0 },
-            //    new double[] { 1, 1 },
-            //};
-            //expectedOutputs = new double[][]
-            //{
-            //    new double[] { 0 },
-            //    new double[] { 1 },
-            //    new double[] { 1 },
-            //    new double[] { 0 },
-            //};
-
-            Ann ann = neat.Train(10000, 100, 0.1, 3, 30, wait, inputs, expectedOutputs, Crossover.TwoPointCrossover, ActivationFunction.Identity);
+            //Ann ann = neat.Train(10000, 100, 0.1, 3, 30, wait, inputs, expectedOutputs, Crossover.TwoPointCrossover, ActivationFunction.Identity);
+            //Ann ann = neat.Train(1000, 100, 0.03, 3, 30, false, inputs, expectedOutputs, Crossover.TwoPointCrossover, ActivationFunction.Identity);
+            Ann ann = neat.Train(1000, 100, 0.03, 3, 30, false, inputs, expectedOutputs, Crossover.BestParentClone, ActivationFunction.Sigmoid);
 
             Dispatcher.Invoke(() =>
             {

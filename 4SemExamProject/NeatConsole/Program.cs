@@ -1,4 +1,5 @@
-﻿using NeatLib;
+﻿using DatabaseNormalizer;
+using NeatLib;
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -34,44 +35,6 @@ namespace NeatConsole
             Console.WriteLine("1 XOR 1 = " + Math.Round(ann.Execute(new double[] { 1, 1 })[0], 2));
 
             Console.ReadLine();
-
-            SqlConnection connection = new SqlConnection()
-            {
-                ConnectionString = "Data Source=(LocalDB)\\MSSQLLocalDB;AttachDbFilename=\"C:\\Users\\Martin\\4SemExamProject.mdf\";Integrated Security=True;Connection Timeout=600;"
-            };
-
-            SqlCommand cmd = new SqlCommand();
-            SqlDataReader reader;
-
-            cmd.CommandText = "SELECT movie_title, genres, actor_2_name, actor_3_name, director_name, budget, gross FROM moviedb WHERE actor_1_name = 'Robert Downey Jr.'";
-            cmd.CommandType = CommandType.Text;
-            cmd.Connection = connection;
-
-            connection.Open();
-
-            reader = cmd.ExecuteReader();
-
-            while (reader.Read())
-            {
-                string[] strings =
-                {
-                    reader["movie_title"].ToString(),
-                    reader["genres"].ToString().Split('|')[0],
-                    //reader["actor_2_name"].ToString(),
-                   // reader["actor_3_name"].ToString(),
-                    reader["director_name"].ToString(),
-                    reader["budget"].ToString(),
-                    reader["gross"].ToString(),
-                };
-                string queryString = "";
-                for (int i = 0; i < strings.Length; i++)
-                {
-                    queryString += strings[i] + (i == strings.Length - 1 ? "" : ", ");
-                }
-                Console.WriteLine(queryString);
-            }
-            reader.Close();
-            connection.Close();
 
             new Program().Run();
             Console.ForegroundColor = ConsoleColor.Green;
@@ -117,6 +80,24 @@ namespace NeatConsole
                 }
             }
             Console.WriteLine();
+        }
+
+        private List<Dictionary<string, double>> GetDataFromDatabase()
+        {
+            string[] columns = new string[]
+            {
+                //"movie_title",
+                "genres",
+                "director_name",
+                "budget",
+                "gross"
+            };
+
+            string condition = "WHERE actor_1_name = 'Robert Downey Jr.'";
+            string databaseLocation = AppDomain.CurrentDomain.BaseDirectory;
+            databaseLocation = databaseLocation.Replace(@"bin\Debug\", @"database\4SemExamProject.mdf");
+            DatabaseHandler dbh = new DatabaseHandler();
+            return dbh.GetNormalizedData(databaseLocation, columns, condition, 0, 1);
         }
     }
 }

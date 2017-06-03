@@ -14,6 +14,57 @@ namespace NeatConsole
     {
         static void Main(string[] args)
         {
+            NormalizedDataAndDictionaries test = new Program().GetDataFromDatabase();
+
+            new Program().Run();
+            Console.ForegroundColor = ConsoleColor.Green;
+            Console.WriteLine("\nDONE");
+            Console.ReadLine();
+        }
+
+        private void Run()
+        {
+            double[][] inputs = new double[][]
+            {
+                new double[] { 1, 2 },
+                new double[] { 2, 2 },
+                new double[] { 3, 2 },
+                new double[] { 4, 2 },
+            };
+
+            double[][] expectedOutputs = new double[][]
+            {
+                new double[] { 2 },
+                new double[] { 4 },
+                new double[] { 6 },
+                new double[] { 8 },
+            };
+
+            Neat neat = new Neat();
+            neat.OnGenerationEnd += (a) =>
+            {
+                Console.WriteLine(">  Gen " + a.Generation + "\tErr: " + a.Error);
+            };
+
+            Ann ann = neat.Train(100, 100, 0.03, 3, 30, false, inputs, expectedOutputs, Crossover.BestParentClone, ActivationFunction.Identity);
+            
+            double finalError = neat.CalculateError(ann, inputs, expectedOutputs, true);
+            Console.WriteLine("Final error: " + finalError);
+            
+            for (int j = 0; j < inputs.Length; j++)
+            {
+                double[] result = ann.Execute(inputs[j]);
+                for (int i = 0; i < result.Length; i++)
+                {
+                    Console.WriteLine($"Result {i}: {Math.Round(result[i], 2)}");
+                }
+            }
+            Console.WriteLine($">>> Result: {Math.Round(ann.Execute(new double[] { 5, 2 })[0], 2)}");
+            Console.WriteLine();
+        }
+
+        private void DoHardcodedTest()
+        {
             Ann ann = new Ann(2, 1, ActivationFunction.Sigmoid);
 
             ann.hiddenNeurons.Add(new Neuron(0, 0) { Bias = -10 });
@@ -35,54 +86,9 @@ namespace NeatConsole
             Console.WriteLine("1 XOR 1 = " + Math.Round(ann.Execute(new double[] { 1, 1 })[0], 2));
 
             Console.ReadLine();
-
-            new Program().Run();
-            Console.ForegroundColor = ConsoleColor.Green;
-            Console.WriteLine("\nDONE");
-            Console.ReadLine();
         }
 
-        private void Run()
-        {
-            double[][] inputs = new double[][]
-            {
-                new double[] { 0, 0 },
-                new double[] { 0, 1 },
-                new double[] { 1, 0 },
-                new double[] { 1, 1 },
-            };
-
-            double[][] expectedOutputs = new double[][]
-            {
-                new double[] { 0 },
-                new double[] { 1 },
-                new double[] { 1 },
-                new double[] { 0 },
-            };
-
-            Neat neat = new Neat();
-            neat.OnGenerationEnd += (a) =>
-            {
-                Console.WriteLine(">  Gen " + a.Generation + "\tErr: " + a.Error);
-            };
-
-            Ann ann = neat.Train(100, 100, 0.03, 3, 30, false, inputs, expectedOutputs, Crossover.BestParentClone, ActivationFunction.Sigmoid);
-            
-            double finalError = neat.CalculateError(ann, inputs, expectedOutputs, true);
-            Console.WriteLine("Final error: " + finalError);
-            
-            for (int j = 0; j < inputs.Length; j++)
-            {
-                double[] result = ann.Execute(inputs[j]);
-                for (int i = 0; i < result.Length; i++)
-                {
-                    Console.WriteLine($"Result {i}: {Math.Round(result[i], 2)}");
-                }
-            }
-            Console.WriteLine();
-        }
-
-        private List<Dictionary<string, double>> GetDataFromDatabase()
+        private NormalizedDataAndDictionaries GetDataFromDatabase()
         {
             string[] columns = new string[]
             {

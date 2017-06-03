@@ -10,7 +10,7 @@ namespace DatabaseNormalizer
 {
     public class DatabaseHandler
     {
-        public List<Dictionary<string, double>> GetNormalizedData(string databaseLocation, string[] columns, string queryConditions, double normalizationMinimum, double normalizationMaximum)
+        public NormalizedDataAndDictionaries GetNormalizedData(string databaseLocation, string[] columns, string queryConditions, double normalizationMinimum, double normalizationMaximum)
         {
             List<string[]> dataFromDatabase = GetDataFromDatabase(databaseLocation, columns, queryConditions);
 
@@ -77,9 +77,9 @@ namespace DatabaseNormalizer
             return resultStrings;
         }
 
-        private List<Dictionary<string, double>> NormalizeData(List<string[]> dataFromDatabase, string[] columns, double normalizationMinimum, double normalizationMaximum)
+        private NormalizedDataAndDictionaries NormalizeData(List<string[]> dataFromDatabase, string[] columns, double normalizationMinimum, double normalizationMaximum)
         {
-            List<Dictionary<string, double>> columnDictionaries = new List<Dictionary<string, double>>();
+            Dictionary<string, double>[] dataDictionaries = new Dictionary<string, double>[columns.Length];
 
             for (int i = 0; i < columns.Length; i++)
             {
@@ -94,10 +94,10 @@ namespace DatabaseNormalizer
                         counter++;
                     }
                 }
-                columnDictionaries.Add(dictionary);
+                dataDictionaries[i] = dictionary;
             }
 
-            foreach (Dictionary<string, double> dictionary in columnDictionaries)
+            foreach (Dictionary<string, double> dictionary in dataDictionaries)
             {
                 for (int i = 0; i < dictionary.Count; i++)
                 {
@@ -109,7 +109,19 @@ namespace DatabaseNormalizer
                 }
             }
 
-            return columnDictionaries;
+            double[][] normalizedData = new double[dataFromDatabase.Count][];
+
+            for (int i = 0; i < dataFromDatabase.Count; i++)
+            {
+                normalizedData[i] = new double[dataFromDatabase[i].Length];
+                for (int j = 0; j < dataFromDatabase[i].Length; j++)
+                {
+                    normalizedData[i][j] = dataDictionaries[j][dataFromDatabase[i][j]];
+                }
+                Console.WriteLine();
+            }
+
+            return new NormalizedDataAndDictionaries(normalizedData, dataDictionaries);
         }
     }
 }

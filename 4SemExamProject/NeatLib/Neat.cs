@@ -15,11 +15,6 @@ namespace NeatLib
 
         private bool waitFlag = false;
 
-        public Neat()
-        {
-
-        }
-
         public Ann Train(int maxGenerations, int generationSize, double? errorThreshold, int mutationRate, int mutationRolls, bool waitForFlag, double[][] inputs, double[][] expectedOutputs, Crossover.CrossoverOperation crossoverOperation, ActivationFunction.ActivationMethod activationMethod)
         {
             Ann[] generation = new Ann[generationSize];

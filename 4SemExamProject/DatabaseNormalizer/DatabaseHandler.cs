@@ -118,7 +118,6 @@ namespace DatabaseNormalizer
                 {
                     normalizedData[i][j] = dataDictionaries[j][dataFromDatabase[i][j]];
                 }
-                Console.WriteLine();
             }
 
             return new NormalizedDataAndDictionaries(normalizedData, dataDictionaries);

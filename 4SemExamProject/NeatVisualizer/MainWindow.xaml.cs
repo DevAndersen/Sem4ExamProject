@@ -1,4 +1,5 @@
-﻿using NeatLib;
+﻿using DatabaseNormalizer;
+using NeatLib;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -138,34 +139,27 @@ namespace NeatVisualizer
                 neat.LowerWaitFlag();
             };
 
-            double[][] inputs = new double[][]
+
+            string[] inputColumns = new string[]
             {
-                new double[] { 1 }
+                //"movie_title",
+                "genres",
+                "director_name",
+                "budget",
             };
 
-            double[][] expectedOutputs = new double[][]
+            string[] expectedOutputColumns = new string[]
             {
-                new double[] { 2 }
+                "gross",
             };
 
-            inputs = new double[][]
-            {
-                new double[] { 0, 0 },
-                new double[] { 0, 1 },
-                new double[] { 1, 0 },
-                new double[] { 1, 1 },
-            };
-            expectedOutputs = new double[][]
-            {
-                new double[] { 0 },
-                new double[] { 1 },
-                new double[] { 1 },
-                new double[] { 0 },
-            };
+            NormalizedDataAndDictionaries inputData = GetDataFromDatabase(inputColumns);
+            NormalizedDataAndDictionaries outputData = GetDataFromDatabase(expectedOutputColumns);
 
             //Ann ann = neat.Train(10000, 100, 0.1, 3, 30, wait, inputs, expectedOutputs, Crossover.TwoPointCrossover, ActivationFunction.Identity);
             //Ann ann = neat.Train(1000, 100, 0.03, 3, 30, false, inputs, expectedOutputs, Crossover.TwoPointCrossover, ActivationFunction.Identity);
-            Ann ann = neat.Train(1000, 100, 0.03, 3, 30, false, inputs, expectedOutputs, Crossover.BestParentClone, ActivationFunction.Sigmoid);
+            //Ann ann = neat.Train(1000, 100, 0.03, 3, 30, false, inputData.NormalizedData, outputData.NormalizedData, Crossover.BestParentClone, ActivationFunction.Sigmoid);
+            Ann ann = neat.Train(1000, 100, 0.03, 3, 30, false, inputData.NormalizedData, outputData.NormalizedData, Crossover.BestParentClone, ActivationFunction.Identity);
 
             Dispatcher.Invoke(() =>
             {
@@ -178,6 +172,15 @@ namespace NeatVisualizer
             {
                 DrawAnn(ann);
             }
+        }
+
+        private NormalizedDataAndDictionaries GetDataFromDatabase(string[] columns)
+        {
+            string condition = "WHERE actor_1_name = 'Robert Downey Jr.'";
+            string databaseLocation = AppDomain.CurrentDomain.BaseDirectory;
+            databaseLocation = databaseLocation.Replace(@"NeatVisualizer\bin\Debug\", @"DatabaseNormalizer\database\4SemExamProject.mdf");
+            DatabaseHandler dbh = new DatabaseHandler();
+            return dbh.GetNormalizedData(databaseLocation, columns, condition, 0, 1);
         }
 
         #region Draw

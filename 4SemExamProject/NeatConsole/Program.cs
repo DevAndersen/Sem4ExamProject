@@ -14,31 +14,45 @@ namespace NeatConsole
     {
         static void Main(string[] args)
         {
-            NormalizedDataAndDictionaries test = new Program().GetDataFromDatabase();
+            string[] inputColumns = new string[]
+            {
+                //"movie_title",
+                "genres",
+                "director_name",
+                "budget",
+            };
 
-            new Program().Run();
+            string[] expectedOutputColumns = new string[]
+            {
+                "gross",
+            };
+
+            NormalizedDataAndDictionaries inputData = new Program().GetDataFromDatabase(inputColumns);
+            NormalizedDataAndDictionaries outputData = new Program().GetDataFromDatabase(expectedOutputColumns);
+
+            new Program().Run(inputData.NormalizedData, outputData.NormalizedData);
             Console.ForegroundColor = ConsoleColor.Green;
             Console.WriteLine("\nDONE");
             Console.ReadLine();
         }
 
-        private void Run()
+        private void Run(double[][] inputs, double[][] expectedOutputs)
         {
-            double[][] inputs = new double[][]
-            {
-                new double[] { 1, 2 },
-                new double[] { 2, 2 },
-                new double[] { 3, 2 },
-                new double[] { 4, 2 },
-            };
+            //double[][] inputs = new double[][]
+            //{
+            //    new double[] { 1, 2 },
+            //    new double[] { 2, 2 },
+            //    new double[] { 3, 2 },
+            //    new double[] { 4, 2 },
+            //};
 
-            double[][] expectedOutputs = new double[][]
-            {
-                new double[] { 2 },
-                new double[] { 4 },
-                new double[] { 6 },
-                new double[] { 8 },
-            };
+            //double[][] expectedOutputs = new double[][]
+            //{
+            //    new double[] { 2 },
+            //    new double[] { 4 },
+            //    new double[] { 6 },
+            //    new double[] { 8 },
+            //};
 
             Neat neat = new Neat();
             neat.OnGenerationEnd += (a) =>
@@ -46,7 +60,7 @@ namespace NeatConsole
                 Console.WriteLine(">  Gen " + a.Generation + "\tErr: " + a.Error);
             };
 
-            Ann ann = neat.Train(100, 100, 0.03, 3, 30, false, inputs, expectedOutputs, Crossover.BestParentClone, ActivationFunction.Identity);
+            Ann ann = neat.Train(1000, 100, 0.03, 2, 30, false, inputs, expectedOutputs, Crossover.TwoPointCrossover, ActivationFunction.Sigmoid);
             
             double finalError = neat.CalculateError(ann, inputs, expectedOutputs, true);
             Console.WriteLine("Final error: " + finalError);
@@ -56,10 +70,10 @@ namespace NeatConsole
                 double[] result = ann.Execute(inputs[j]);
                 for (int i = 0; i < result.Length; i++)
                 {
-                    Console.WriteLine($"Result {i}: {Math.Round(result[i], 2)}");
+                    //Console.WriteLine($"Result {i}: {Math.Round(result[i], 2)}");
                 }
             }
-            Console.WriteLine($">>> Result: {Math.Round(ann.Execute(new double[] { 5, 2 })[0], 2)}");
+            Console.WriteLine($">>> Result: {Math.Round(ann.Execute(inputs[1])[0], 2)}");
             Console.WriteLine();
         }
 
@@ -88,20 +102,11 @@ namespace NeatConsole
             Console.ReadLine();
         }
 
-        private NormalizedDataAndDictionaries GetDataFromDatabase()
+        private NormalizedDataAndDictionaries GetDataFromDatabase(string[] columns)
         {
-            string[] columns = new string[]
-            {
-                //"movie_title",
-                "genres",
-                "director_name",
-                "budget",
-                "gross"
-            };
-
-            string condition = "WHERE actor_1_name = 'Robert Downey Jr.'";
+            string condition = "WHERE actor_1_name = 'Robert De Niro'";
             string databaseLocation = AppDomain.CurrentDomain.BaseDirectory;
-            databaseLocation = databaseLocation.Replace(@"bin\Debug\", @"database\4SemExamProject.mdf");
+            databaseLocation = databaseLocation.Replace(@"NeatConsole\bin\Debug\", @"DatabaseNormalizer\database\4SemExamProject.mdf");
             DatabaseHandler dbh = new DatabaseHandler();
             return dbh.GetNormalizedData(databaseLocation, columns, condition, 0, 1);
         }

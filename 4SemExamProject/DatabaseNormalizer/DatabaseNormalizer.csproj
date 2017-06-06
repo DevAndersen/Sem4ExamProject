@@ -55,7 +55,10 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="DatabaseHandler.cs" />
+    <Compile Include="DatabaseHandlers\DatabaseHandlerCSV.cs" />
+    <Compile Include="DatabaseHandlers\DatabaseHandlerSQL.cs" />
+    <Compile Include="DatabaseHandlers\IDatabaseHandler.cs" />
+    <Compile Include="DataManager.cs" />
     <Compile Include="NormalizedDataAndDictionaries.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
@@ -79,6 +82,9 @@
       <DependentUpon>4SemExamProject.mdf</DependentUpon>
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Database\movie_metadata.csv" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

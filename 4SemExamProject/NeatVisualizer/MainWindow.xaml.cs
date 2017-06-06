@@ -1,4 +1,5 @@
 ﻿using DatabaseNormalizer;
+using DatabaseNormalizer.DatabaseHandlers;
 using NeatLib;
 using System;
 using System.Collections.Generic;
@@ -179,8 +180,7 @@ namespace NeatVisualizer
             string condition = "WHERE actor_1_name = 'Robert Downey Jr.'";
             string databaseLocation = AppDomain.CurrentDomain.BaseDirectory;
             databaseLocation = databaseLocation.Replace(@"NeatVisualizer\bin\Debug\", @"DatabaseNormalizer\database\4SemExamProject.mdf");
-            DatabaseHandler dbh = new DatabaseHandler();
-            return dbh.GetNormalizedData(databaseLocation, columns, condition, 0, 1);
+            return DataManager.GetNormalizedDataFromDatabase(new DatabaseHandlerSQL(), databaseLocation, columns, condition, 0, 1);
         }
 
         #region Draw

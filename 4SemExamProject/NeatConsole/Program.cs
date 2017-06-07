@@ -107,8 +107,8 @@ namespace NeatConsole
         {
             string condition = "WHERE actor_1_name = 'Robert De Niro'";
             string databaseLocation = AppDomain.CurrentDomain.BaseDirectory;
-            databaseLocation = databaseLocation.Replace(@"NeatConsole\bin\Debug\", @"DatabaseNormalizer\database\movie_metadata.csv");
-            return DataManager.GetNormalizedDataFromDatabase(new DatabaseHandlerCSV(), databaseLocation, columns, condition, 0, 1);
+            databaseLocation = databaseLocation.Replace(@"NeatConsole\bin\Debug\", @"DatabaseNormalizer\database\4SemExamProject.mdf");
+            return DataManager.GetNormalizedDataFromDatabase(new DatabaseHandlerSQL(), databaseLocation, columns, condition, 0, 1);
         }
     }
 }

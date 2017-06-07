@@ -68,6 +68,10 @@
       <Project>{a3621b72-1014-42bc-b51a-eb39af357263}</Project>
       <Name>DatabaseNormalizer</Name>
     </ProjectReference>
+    <ProjectReference Include="..\NeatLib2\NeatLib2.csproj">
+      <Project>{fb640836-c064-4484-bfad-ad910a32b121}</Project>
+      <Name>NeatLib2</Name>
+    </ProjectReference>
     <ProjectReference Include="..\NeatLib\NeatLib.csproj">
       <Project>{0699f6e8-2d87-4887-b25e-20b43619389d}</Project>
       <Name>NeatLib</Name>

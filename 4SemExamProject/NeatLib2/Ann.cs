@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace NeatLib
+namespace NeatLib2
 {
     [Serializable]
     public class Ann
@@ -15,7 +15,6 @@ namespace NeatLib
         public Neuron[] inputNeurons;
         public Neuron[] outputNeurons;
         public List<Neuron> hiddenNeurons = new List<Neuron>();
-        public List<Synapse> synapses = new List<Synapse>();
 
         private ActivationFunction.ActivationMethod activationMethod;
 
@@ -53,7 +52,7 @@ namespace NeatLib
             {
                 foreach (Neuron neuron in GetNeuronsForLayer(layer))
                 {
-                    Synapse[] synapsesToNeuron = synapses.Where(x => x.ToLayer == layer && x.ToNeuron == neuron.NeuronPosition).ToArray();
+                    Synapse[] synapsesToNeuron = neuron.synapses.ToArray();
                     double value = 0;
 
                     foreach (Synapse synapseFromneuron in synapsesToNeuron)
@@ -98,7 +97,7 @@ namespace NeatLib
             {
                 foreach (Neuron outputNeuron in outputNeurons)
                 {
-                    synapses.Add(new Synapse(inputNeuron.Layer, inputNeuron.NeuronPosition, outputNeuron.Layer, outputNeuron.NeuronPosition));
+                    outputNeuron.synapses.Add(new Synapse(outputNeuron.Layer, outputNeuron.NeuronPosition));
                 }
             }
         }
@@ -170,6 +169,13 @@ namespace NeatLib
 
         public List<Synapse> GetAllSynapses()
         {
+            List<Synapse> synapses = new List<Synapse>();
+
+            foreach (Neuron neuron in GetAllNeurons())
+            {
+                synapses.AddRange(neuron.synapses);
+            }
+
             return synapses;
         }
     }

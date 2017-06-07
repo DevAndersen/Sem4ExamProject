@@ -1,6 +1,6 @@
 ﻿using DatabaseNormalizer;
 using DatabaseNormalizer.DatabaseHandlers;
-using NeatLib;
+using NeatLib2;
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -80,20 +80,20 @@ namespace NeatConsole
 
         private void DoHardcodedTest()
         {
-            Ann ann = new Ann(2, 1, ActivationFunction.Sigmoid);
+            NeatLib.Ann ann = new NeatLib.Ann(2, 1, NeatLib.ActivationFunction.Sigmoid);
 
-            ann.hiddenNeurons.Add(new Neuron(0, 0) { Bias = -10 });
-            ann.hiddenNeurons.Add(new Neuron(0, 1) { Bias = 30 });
+            ann.hiddenNeurons.Add(new NeatLib.Neuron(0, 0) { Bias = -10 });
+            ann.hiddenNeurons.Add(new NeatLib.Neuron(0, 1) { Bias = 30 });
             ann.outputNeurons[0].Bias = -30;
 
-            ann.synapses.Add(new Synapse(-1, 0, 0, 0) { Weight = 20 });
-            ann.synapses.Add(new Synapse(-1, 1, 0, 0) { Weight = 20 });
+            ann.synapses.Add(new NeatLib.Synapse(-1, 0, 0, 0) { Weight = 20 });
+            ann.synapses.Add(new NeatLib.Synapse(-1, 1, 0, 0) { Weight = 20 });
 
-            ann.synapses.Add(new Synapse(-1, 0, 0, 1) { Weight = -20 });
-            ann.synapses.Add(new Synapse(-1, 1, 0, 1) { Weight = -20 });
+            ann.synapses.Add(new NeatLib.Synapse(-1, 0, 0, 1) { Weight = -20 });
+            ann.synapses.Add(new NeatLib.Synapse(-1, 1, 0, 1) { Weight = -20 });
 
-            ann.synapses.Add(new Synapse(0, 0, -2, 0) { Weight = 20 });
-            ann.synapses.Add(new Synapse(0, 1, -2, 0) { Weight = 20 });
+            ann.synapses.Add(new NeatLib.Synapse(0, 0, -2, 0) { Weight = 20 });
+            ann.synapses.Add(new NeatLib.Synapse(0, 1, -2, 0) { Weight = 20 });
 
             Console.WriteLine("0 XOR 0 = " + Math.Round(ann.Execute(new double[] { 0, 0 })[0], 2));
             Console.WriteLine("0 XOR 1 = " + Math.Round(ann.Execute(new double[] { 0, 1 })[0], 2));

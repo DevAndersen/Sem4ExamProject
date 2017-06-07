@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace NeatLib
+namespace NeatLib2
 {
     public static class Mutations
     {
@@ -18,8 +18,6 @@ namespace NeatLib
             MutateSynapseWeightDecreaseRandom,
             MutateSynapseFromLayer,
             MutateSynapseFromNeuron,
-            MutateSynapseToLayer,
-            MutateSynapseToNeuron,
             MutateSynapseRemoveRandom,
             MutateNeuronAddRandom,
             MutateNeuronBiasRandomize,
@@ -45,7 +43,7 @@ namespace NeatLib
         }
 
         #region Synapse mutations
-        
+
         private static void MutateSynapseAddRandom(Ann ann)
         {
             if (ann.hiddenNeurons.Count == 0)
@@ -55,49 +53,70 @@ namespace NeatLib
             int fromLayer = layers.Length != 0 ? layers[Util.rand.Next(layers.Length)] : 0;
             int[] fromNeuronPositions = ann.GetNeuronsForLayer(fromLayer).Select(x => x.NeuronPosition).ToArray();
             int fromNeuron = fromNeuronPositions[Util.rand.Next(fromNeuronPositions.Length)];
-            int toLayer = layers.Length != 0 ? layers[Util.rand.Next(layers.Length)] : 0;
-            int[] toNeuronPositions = ann.GetNeuronsForLayer(toLayer).Select(x => x.NeuronPosition).ToArray();
-            int toNeuron = toNeuronPositions[Util.rand.Next(toNeuronPositions.Length)];
+            Neuron synapseNeuron = ann.GetAllNeurons()[Util.rand.Next(ann.GetAllNeurons().Count)];
 
-            if(toLayer != fromLayer && !HelperDoesSynapseExist(ann, fromLayer, fromNeuron, toLayer, toNeuron))
+            if (!HelperDoesSynapseExist(ann, fromLayer, fromNeuron))
             {
-                ann.synapses.Add(new Synapse(fromLayer, fromNeuron, toLayer, toNeuron));
+                synapseNeuron.synapses.Add(new Synapse(fromLayer, fromNeuron));
             }
         }
 
         private static void MutateSynapseWeightRandomize(Ann ann)
         {
-            if (ann.synapses.Count == 0)
+            if (HelperCountSynapses(ann) == 0)
                 return;
 
-            ann.synapses[Util.rand.Next(ann.synapses.Count)].Weight = Util.rand.NextDouble();
+            Neuron synapseNeuron = ann.GetAllNeurons()[Util.rand.Next(ann.GetAllNeurons().Count)];
+
+            if (synapseNeuron.synapses.Count == 0)
+                return;
+
+            Synapse synapse = synapseNeuron.synapses[Util.rand.Next(synapseNeuron.synapses.Count)];
+            synapse.Weight = Util.rand.NextDouble();
         }
 
         private static void MutateSynapseWeightIncreaseRandom(Ann ann)
         {
-            if (ann.synapses.Count == 0)
+            if (HelperCountSynapses(ann) == 0)
                 return;
 
-            ann.synapses[Util.rand.Next(ann.synapses.Count)].Weight += Util.rand.NextDouble();
+            Neuron synapseNeuron = ann.GetAllNeurons()[Util.rand.Next(ann.GetAllNeurons().Count)];
+
+            if (synapseNeuron.synapses.Count == 0)
+                return;
+
+            Synapse synapse = synapseNeuron.synapses[Util.rand.Next(synapseNeuron.synapses.Count)];
+            synapse.Weight += Util.rand.NextDouble();
         }
 
         private static void MutateSynapseWeightDecreaseRandom(Ann ann)
         {
-            if (ann.synapses.Count == 0)
+            if (HelperCountSynapses(ann) == 0)
                 return;
 
-            ann.synapses[Util.rand.Next(ann.synapses.Count)].Weight -= Util.rand.NextDouble();
+            Neuron synapseNeuron = ann.GetAllNeurons()[Util.rand.Next(ann.GetAllNeurons().Count)];
+
+            if (synapseNeuron.synapses.Count == 0)
+                return;
+
+            Synapse synapse = synapseNeuron.synapses[Util.rand.Next(synapseNeuron.synapses.Count)];
+            synapse.Weight -= Util.rand.NextDouble();
         }
 
         private static void MutateSynapseFromLayer(Ann ann)
         {
-            if (ann.synapses.Count == 0)
+            if (HelperCountSynapses(ann) == 0)
                 return;
 
-            Synapse synapse = ann.synapses[Util.rand.Next(ann.synapses.Count)];
+            Neuron synapseNeuron = ann.GetAllNeurons()[Util.rand.Next(ann.GetAllNeurons().Count)];
+
+            if (synapseNeuron.synapses.Count == 0)
+                return;
+
+            Synapse synapse = synapseNeuron.synapses[Util.rand.Next(synapseNeuron.synapses.Count)];
             int layer = ann.GetAllLayers()[Util.rand.Next(ann.GetAllLayers().Length)];
 
-            if(synapse.ToLayer != layer && !HelperDoesSynapseExist(ann, layer, synapse.FromNeuron, synapse.ToLayer, synapse.ToNeuron))
+            if(!HelperDoesSynapseExist(ann, layer, synapse.FromNeuron))
             {
                 synapse.FromLayer = layer;
             }
@@ -105,59 +124,36 @@ namespace NeatLib
 
         private static void MutateSynapseFromNeuron(Ann ann)
         {
-            if (ann.synapses.Count == 0)
+            if (HelperCountSynapses(ann) == 0)
                 return;
 
-            Synapse synapse = ann.synapses[Util.rand.Next(ann.synapses.Count)];
+            Neuron synapseNeuron = ann.GetAllNeurons()[Util.rand.Next(ann.GetAllNeurons().Count)];
+
+            if (synapseNeuron.synapses.Count == 0)
+                return;
+
+            Synapse synapse = synapseNeuron.synapses[Util.rand.Next(synapseNeuron.synapses.Count)];
             int fromLayer = synapse.FromLayer;
             Neuron[] neuronsInLayer = ann.GetNeuronsForLayer(fromLayer);
             Neuron neuron = neuronsInLayer.Length != 0 ? neuronsInLayer[Util.rand.Next(neuronsInLayer.Length)] : null;
             int newNeuronPosition = neuron != null ? neuron.NeuronPosition : 0;
-            if (!HelperDoesSynapseExist(ann, synapse.FromLayer, newNeuronPosition, synapse.ToLayer, synapse.ToNeuron))
+            if (!HelperDoesSynapseExist(ann, synapse.FromLayer, newNeuronPosition))
             {
                 synapse.FromNeuron = newNeuronPosition;
             }
         }
-
-        private static void MutateSynapseToLayer(Ann ann)
-        {
-            if (ann.synapses.Count == 0)
-                return;
-
-            if (ann.synapses.Count == 0)
-                return;
-
-            Synapse synapse = ann.synapses[Util.rand.Next(ann.synapses.Count)];
-            int layer = ann.GetAllLayers()[Util.rand.Next(ann.GetAllLayers().Length)];
-
-            if (synapse.FromLayer != layer && !HelperDoesSynapseExist(ann, synapse.FromLayer, synapse.FromNeuron, synapse.ToLayer, layer))
-            {
-                synapse.ToLayer = layer;
-            }
-        }
-
-        private static void MutateSynapseToNeuron(Ann ann)
-        {
-            if (ann.synapses.Count == 0)
-                return;
-
-            Synapse synapse = ann.synapses[Util.rand.Next(ann.synapses.Count)];
-            int toLayer = synapse.ToLayer;
-            Neuron[] neuronsInLayer = ann.GetNeuronsForLayer(toLayer);
-            Neuron neuron = neuronsInLayer.Length != 0 ? neuronsInLayer[Util.rand.Next(neuronsInLayer.Length)] : null;
-            int newNeuronPosition = neuron != null ? neuron.NeuronPosition : 0;
-            if (!HelperDoesSynapseExist(ann, synapse.FromLayer, synapse.FromNeuron, synapse.ToLayer, newNeuronPosition))
-            {
-                synapse.ToNeuron = newNeuronPosition;
-            }
-        }
-
+        
         private static void MutateSynapseRemoveRandom(Ann ann)
         {
-            if (ann.synapses.Count == 0)
+            if (HelperCountSynapses(ann) == 0)
                 return;
 
-            ann.synapses.RemoveAt(Util.rand.Next(ann.synapses.Count));
+            Neuron neuron = ann.GetAllNeurons()[Util.rand.Next(ann.GetAllNeurons().Count)];
+
+            if (neuron.synapses.Count == 0)
+                return;
+
+            neuron.synapses.RemoveAt(Util.rand.Next(neuron.synapses.Count));
         }
 
         #endregion
@@ -266,23 +262,22 @@ namespace NeatLib
 
         #region Helper methods
 
-        private static bool HelperDoesSynapseExist(Ann ann, int fromLayer, int fromNeuron, int toLayer, int toNeuron)
+        private static bool HelperDoesSynapseExist(Ann ann, int fromLayer, int fromNeuron)
         {
-            bool exists = ann.synapses.Where(x =>
-            x.FromLayer == fromLayer &&
-            x.FromNeuron == fromNeuron &&
-            x.ToLayer == toLayer &&
-            x.ToNeuron == toNeuron
-            ).ToArray().Length != 0;
+            bool exists = false;
 
-            bool existsReversed = ann.synapses.Where(x =>
-            x.FromLayer == toLayer &&
-            x.FromNeuron == toNeuron &&
-            x.ToLayer == fromLayer &&
-            x.ToNeuron == fromNeuron
-            ).ToArray().Length != 0;
+            foreach (Neuron neuron in ann.GetAllNeurons())
+            {
+                foreach (Synapse synapse in neuron.synapses)
+                {
+                    if (synapse.FromLayer == fromLayer && synapse.FromNeuron == fromNeuron)
+                    {
+                        exists = true;
+                    }
+                }
+            }
 
-            return exists || existsReversed;
+            return exists;
         }
 
         private static bool HelperDoesNeuronExist(Ann ann, int layer, int neuronPosition)
@@ -295,27 +290,28 @@ namespace NeatLib
 
         private static void HelperCleanUpDuplicates(Ann ann)
         {
-            List<Synapse> synapseCheckList = new List<Synapse>();
             List<Neuron> neuronCheckList = new List<Neuron>();
 
-            foreach (Synapse synapse in ann.synapses)
+            foreach (Neuron neuron in ann.GetAllNeurons())
             {
-                bool foundOnChecklist = false;
-                foreach (Synapse synapseFromCheckList in synapseCheckList)
+                List<Synapse> synapseCheckList = new List<Synapse>();
+                foreach (Synapse synapse in neuron.synapses)
                 {
-                    if(synapse.FromLayer == synapseFromCheckList.FromLayer &&
-                       synapse.FromNeuron == synapseFromCheckList.FromNeuron &&
-                       synapse.ToLayer == synapseFromCheckList.ToLayer &&
-                       synapse.ToNeuron == synapseFromCheckList.ToNeuron)
+                    bool foundOnChecklist = false;
+                    foreach (Synapse synapseFromCheckList in synapseCheckList)
                     {
-                        foundOnChecklist = true;
+                        if (synapse.FromLayer == synapseFromCheckList.FromLayer && synapse.FromNeuron == synapseFromCheckList.FromNeuron)
+                        {
+                            foundOnChecklist = true;
+                        }
+                    }
+
+                    if (!foundOnChecklist)
+                    {
+                        synapseCheckList.Add(synapse);
                     }
                 }
-
-                if(!foundOnChecklist)
-                {
-                    synapseCheckList.Add(synapse);
-                }
+                neuron.synapses = synapseCheckList;
             }
 
             foreach (Neuron neuron in ann.hiddenNeurons)
@@ -335,24 +331,36 @@ namespace NeatLib
                     neuronCheckList.Add(neuron);
                 }
             }
-
-            ann.synapses = synapseCheckList;
             ann.hiddenNeurons = neuronCheckList;
         }
 
         private static void HelperCleanUpBackwardsSynapses(Ann ann)
         {
-            List<Synapse> synapseChecklist = new List<Synapse>();
-
-            foreach (Synapse synapse in ann.synapses)
+            foreach (Neuron neuron in ann.GetAllNeurons())
             {
-                if(synapse.FromLayer != -2 && (synapse.FromLayer == -1 || synapse.FromLayer < synapse.ToLayer))
+                List<Synapse> synapseChecklist = new List<Synapse>();
+                foreach (Synapse synapse in neuron.synapses)
                 {
-                    synapseChecklist.Add(synapse);
+                    if(synapse.FromLayer > neuron.Layer)
+                    {
+                        synapseChecklist.Add(synapse);
+                    }
+                }
+                neuron.synapses = synapseChecklist;
+            }
+        }
+
+        private static int HelperCountSynapses(Ann ann)
+        {
+            int synapseCount = 0;
+            foreach (Neuron neuron in ann.GetAllNeurons())
+            {
+                foreach (Synapse synapse in neuron.synapses)
+                {
+                    synapseCount++;
                 }
             }
-
-            ann.synapses = synapseChecklist;
+            return synapseCount;
         }
 
         #endregion

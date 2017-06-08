@@ -180,7 +180,7 @@ namespace NeatVisualizer
             string condition = "WHERE actor_1_name = 'Robert Downey Jr.'";
             string databaseLocation = AppDomain.CurrentDomain.BaseDirectory;
             databaseLocation = databaseLocation.Replace(@"NeatVisualizer\bin\Debug\", @"DatabaseNormalizer\database\4SemExamProject.mdf");
-            return DataManager.GetNormalizedDataFromDatabase(new DatabaseHandlerSQL(), databaseLocation, columns, condition, 0, 1);
+            return DataManager.GetNormalizedDataFromDatabase(new DatabaseHandlerSQL(), databaseLocation, columns, condition, 0, 1, 0.25);
         }
 
         #region Draw

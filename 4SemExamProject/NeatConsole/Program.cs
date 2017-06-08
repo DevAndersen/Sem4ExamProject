@@ -1,6 +1,6 @@
 ﻿using DatabaseNormalizer;
 using DatabaseNormalizer.DatabaseHandlers;
-using NeatLib2;
+using NeatLib;
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -8,6 +8,7 @@ using System.Data.SqlClient;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using static DatabaseNormalizer.NormalizedDataAndDictionaries;
 
 namespace NeatConsole
 {
@@ -31,50 +32,35 @@ namespace NeatConsole
             NormalizedDataAndDictionaries inputData = new Program().GetDataFromDatabase(inputColumns);
             NormalizedDataAndDictionaries outputData = new Program().GetDataFromDatabase(expectedOutputColumns);
 
-            new Program().Run(inputData.NormalizedData, outputData.NormalizedData);
+            new Program().Run(inputData.NormalizedData, outputData.NormalizedData, outputData.denormalizationVariablesList[0]);
             Console.ForegroundColor = ConsoleColor.Green;
             Console.WriteLine("\nDONE");
             Console.ReadLine();
         }
 
-        private void Run(double[][] inputs, double[][] expectedOutputs)
+        private void Run(double[][] inputs, double[][] expectedOutputs, DenormalizationVariables denormalizationVariables)
         {
-            //double[][] inputs = new double[][]
-            //{
-            //    new double[] { 1, 2 },
-            //    new double[] { 2, 2 },
-            //    new double[] { 3, 2 },
-            //    new double[] { 4, 2 },
-            //};
-
-            //double[][] expectedOutputs = new double[][]
-            //{
-            //    new double[] { 2 },
-            //    new double[] { 4 },
-            //    new double[] { 6 },
-            //    new double[] { 8 },
-            //};
-
             Neat neat = new Neat();
             neat.OnGenerationEnd += (a) =>
             {
                 Console.WriteLine(">  Gen " + a.Generation + "\tErr: " + a.Error);
             };
 
-            Ann ann = neat.Train(1000, 100, 0.03, 2, 30, false, inputs, expectedOutputs, Crossover.TwoPointCrossover, ActivationFunction.Sigmoid);
+            Ann ann = neat.Train(100, 100, 0.03, 2, 30, false, inputs, expectedOutputs, Crossover.TwoPointCrossover, ActivationFunction.Sigmoid);
             
             double finalError = neat.CalculateError(ann, inputs, expectedOutputs, true);
             Console.WriteLine("Final error: " + finalError);
-            
-            for (int j = 0; j < inputs.Length; j++)
-            {
-                double[] result = ann.Execute(inputs[j]);
-                for (int i = 0; i < result.Length; i++)
-                {
-                    //Console.WriteLine($"Result {i}: {Math.Round(result[i], 2)}");
-                }
-            }
-            Console.WriteLine($">>> Result: {Math.Round(ann.Execute(inputs[1])[0], 2)}");
+
+            int index = 1;
+
+            double normalizedResult = Math.Round(ann.Execute(inputs[index])[0], 2);
+            double actualResult = DataManager.DenormalizeNumeric(normalizedResult, denormalizationVariables.NormalizedFloor, denormalizationVariables.NormalizedCeiling, denormalizationVariables.NumericNormalizationMargin, denormalizationVariables.SmallestTrainingValue, denormalizationVariables.LargestTrainingValue);
+            double expectedResult = DataManager.DenormalizeNumeric(expectedOutputs[index][0], denormalizationVariables.NormalizedFloor, denormalizationVariables.NormalizedCeiling, denormalizationVariables.NumericNormalizationMargin, denormalizationVariables.SmallestTrainingValue, denormalizationVariables.LargestTrainingValue);
+
+            Console.WriteLine($">>> Expected Normalized result: {expectedOutputs[index][0]}");
+            Console.WriteLine($">>> Actual Normalized result: {normalizedResult}");
+            Console.WriteLine($">>> Expected real result: {expectedResult}");
+            Console.WriteLine($">>> Actual real result: {actualResult}");
             Console.WriteLine();
         }
 
@@ -108,7 +94,7 @@ namespace NeatConsole
             string condition = "WHERE actor_1_name = 'Robert De Niro'";
             string databaseLocation = AppDomain.CurrentDomain.BaseDirectory;
             databaseLocation = databaseLocation.Replace(@"NeatConsole\bin\Debug\", @"DatabaseNormalizer\database\4SemExamProject.mdf");
-            return DataManager.GetNormalizedDataFromDatabase(new DatabaseHandlerSQL(), databaseLocation, columns, condition, 0, 1);
+            return DataManager.GetNormalizedDataFromDatabase(new DatabaseHandlerSQL(), databaseLocation, columns, condition, 0, 1, 0.25);
         }
     }
 }

@@ -6,19 +6,20 @@ using System.Data.SqlClient;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using static DatabaseNormalizer.NormalizedDataAndDictionaries;
 
 namespace DatabaseNormalizer
 {
     public class DataManager
     {
-        public static NormalizedDataAndDictionaries GetNormalizedDataFromDatabase(IDatabaseHandler databaseHandler, string databaseLocation, string[] columns, string queryConditions, double normalizationMinimum, double normalizationMaximum)
+        public static NormalizedDataAndDictionaries GetNormalizedDataFromDatabase(IDatabaseHandler databaseHandler, string databaseLocation, string[] columns, string queryConditions, double normalizationMinimum, double normalizationMaximum, double numericNormalizationMargin)
         {
             List<string[]> dataFromDatabase = databaseHandler.GetDataFromDatabase(databaseLocation, columns, queryConditions);
 
-            return NormalizeData(dataFromDatabase, columns, normalizationMinimum, normalizationMaximum);
+            return NormalizeData(dataFromDatabase, columns, normalizationMinimum, normalizationMaximum, numericNormalizationMargin);
         }
 
-        private static NormalizedDataAndDictionaries NormalizeData(List<string[]> dataFromDatabase, string[] columns, double normalizationMinimum, double normalizationMaximum)
+        private static NormalizedDataAndDictionaries NormalizeData(List<string[]> dataFromDatabase, string[] columns, double normalizedFloor, double normalizedCeiling, double numericNormalizationMargin)
         {
             Dictionary<string, double>[] dataDictionaries = new Dictionary<string, double>[columns.Length];
 
@@ -37,6 +38,8 @@ namespace DatabaseNormalizer
                 }
                 dataDictionaries[i] = dictionary;
             }
+            
+            List<DenormalizationVariables> denormalizationVariablesList = new List<DenormalizationVariables>();
 
             foreach (Dictionary<string, double> dictionary in dataDictionaries)
             {
@@ -44,8 +47,9 @@ namespace DatabaseNormalizer
 
                 for (int i = 0; i < dictionary.Count; i++)
                 {
-                    double value = 0;
-                    bool isKeyNumeric = Double.TryParse(dictionary.ElementAt(i).Key, out value);
+                    //outValue only exists because it needs to, due to the nature of TryParse methods.
+                    double outValue = 0;
+                    bool isKeyNumeric = Double.TryParse(dictionary.ElementAt(i).Key, out outValue) || dictionary.ElementAt(i).Key.Length == 0;
                     if (!isKeyNumeric)
                     {
                         isNumeric = false;
@@ -56,13 +60,12 @@ namespace DatabaseNormalizer
                 {
                     double? smallestTrainingValue = null;
                     double? largestTrainingValue = null;
-                    double margin = 0.25;
 
                     for (int i = 0; i < dictionary.Count; i++)
                     {
                         string key = dictionary.ElementAt(i).Key;
 
-                        double keyAsDouble = Double.TryParse(key, out keyAsDouble) ? keyAsDouble : throw new Exception($"Could not convert {key} to type Double.");
+                        double keyAsDouble = Double.TryParse(key.Length == 0 ? 0.ToString() : key, out keyAsDouble) ? keyAsDouble : throw new Exception($"Could not convert {key} to type Double.");
 
                         if (smallestTrainingValue == null || keyAsDouble < smallestTrainingValue)
                         {
@@ -73,26 +76,23 @@ namespace DatabaseNormalizer
                             largestTrainingValue = keyAsDouble;
                         }
                     }
+                    denormalizationVariablesList.Add(new DenormalizationVariables(normalizedFloor, normalizedCeiling, numericNormalizationMargin, smallestTrainingValue.Value, largestTrainingValue.Value));
 
                     for (int i = 0; i < dictionary.Count; i++)
                     {
                         string key = dictionary.ElementAt(i).Key;
-
-                        double keyAsDouble = Double.TryParse(key, out keyAsDouble) ? keyAsDouble : throw new Exception($"Could not convert {key} to type Double.");
-
-                        double normalizedValue = NormalizeNumeric(keyAsDouble, normalizationMinimum, normalizationMaximum, margin, smallestTrainingValue.Value, largestTrainingValue.Value);
-
+                        double keyAsDouble = Double.TryParse(key.Length == 0 ? 0.ToString() : key, out keyAsDouble) ? keyAsDouble : throw new Exception($"Could not convert {key} to type Double.");
+                        double normalizedValue = NormalizeNumeric(keyAsDouble, normalizedFloor, normalizedCeiling, numericNormalizationMargin, smallestTrainingValue.Value, largestTrainingValue.Value);
                         dictionary[key] = normalizedValue;
                     }
                 }
                 else
                 {
+                    denormalizationVariablesList.Add(null);
                     for (int i = 0; i < dictionary.Count; i++)
                     {
                         string key = dictionary.ElementAt(i).Key;
-
-                        double normalizedValue = NormalizeIndex(i, dictionary.Count, normalizationMinimum, normalizationMaximum);
-
+                        double normalizedValue = NormalizeIndex(i, dictionary.Count, normalizedFloor, normalizedCeiling);
                         dictionary[key] = normalizedValue;
                     }
                 }
@@ -109,7 +109,7 @@ namespace DatabaseNormalizer
                 }
             }
 
-            return new NormalizedDataAndDictionaries(normalizedData, dataDictionaries);
+            return new NormalizedDataAndDictionaries(normalizedData, dataDictionaries, denormalizationVariablesList);
         }
 
         private static double NormalizeIndex(int index, int length, double normalizationMinimum, double normalizationMaximum)
@@ -122,6 +122,13 @@ namespace DatabaseNormalizer
             double normSmall = (normalizedCeiling - normalizedFloor) * normalizationMargin;
             double normLarge = (normalizedCeiling - normalizedFloor) * (1 - normalizationMargin);
             return normSmall + (value / (largestTrainingValue - smallestTrainingValue) * (normLarge - normSmall));
+        }
+
+        public static double DenormalizeNumeric(double value, double normalizedFloor, double normalizedCeiling, double normalizationMargin, double smallestTrainingValue, double largestTrainingValue)
+        {
+            double normSmall = (normalizedCeiling - normalizedFloor) * normalizationMargin;
+            double normLarge = (normalizedCeiling - normalizedFloor) * (1 - normalizationMargin);
+            return (value - normSmall) * ((largestTrainingValue - smallestTrainingValue) / (normLarge - normSmall));
         }
     }
 }

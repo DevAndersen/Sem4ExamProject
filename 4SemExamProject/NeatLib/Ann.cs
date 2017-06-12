@@ -47,7 +47,7 @@ namespace NeatLib
 
             List<int> layersToGoThrough = new List<int>();
             layersToGoThrough.AddRange(GetHiddenLayers());
-            layersToGoThrough.Add((int)Neuron.BaseNeuronType.Output);
+            layersToGoThrough.Add((int)Neuron.IONeuronType.Output);
 
             foreach (int layer in layersToGoThrough)
             {
@@ -84,11 +84,11 @@ namespace NeatLib
 
             for (int i = 0; i < inputNeurons.Length; i++)
             {
-                inputNeurons[i] = new Neuron(Neuron.BaseNeuronType.Input, i);
+                inputNeurons[i] = new Neuron(Neuron.IONeuronType.Input, i);
             }
             for (int i = 0; i < outputNeurons.Length; i++)
             {
-                outputNeurons[i] = new Neuron(Neuron.BaseNeuronType.Output, i);
+                outputNeurons[i] = new Neuron(Neuron.IONeuronType.Output, i);
             }
         }
 

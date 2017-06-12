@@ -234,16 +234,16 @@ namespace NeatVisualizer
                     int xFrom = x.FromLayer * tilesize + tilesize;
                     int xTo = x.ToLayer * tilesize + tilesize;
 
-                    if (x.FromLayer == (int)Neuron.BaseNeuronType.Input)
+                    if (x.FromLayer == (int)Neuron.IONeuronType.Input)
                         xFrom = 0;
 
-                    if (x.ToLayer == (int)Neuron.BaseNeuronType.Input)
+                    if (x.ToLayer == (int)Neuron.IONeuronType.Input)
                         xTo = 0;
 
-                    if (x.FromLayer == (int)Neuron.BaseNeuronType.Output)
+                    if (x.FromLayer == (int)Neuron.IONeuronType.Output)
                         xFrom = canvasMaxX + tilesize * 2;
 
-                    if (x.ToLayer == (int)Neuron.BaseNeuronType.Output)
+                    if (x.ToLayer == (int)Neuron.IONeuronType.Output)
                         xTo = canvasMaxX + tilesize * 2;
 
                     DrawLine(synapseOffset + xFrom, x.FromNeuron * tilesize + synapseOffset, synapseOffset + xTo, x.ToNeuron * tilesize + synapseOffset, x.Weight);
@@ -254,7 +254,7 @@ namespace NeatVisualizer
 
             ann.GetAllLayers().ToList().ForEach(x =>
             {
-                if (x == (int)Neuron.BaseNeuronType.Input)
+                if (x == (int)Neuron.IONeuronType.Input)
                 {
                     ann.GetNeuronsForLayer(x).ToList().ForEach(y =>
                     {
@@ -266,7 +266,7 @@ namespace NeatVisualizer
 
             ann.GetAllLayers().ToList().ForEach(x =>
             {
-                if (x == (int)Neuron.BaseNeuronType.Output)
+                if (x == (int)Neuron.IONeuronType.Output)
                 {
                     ann.GetNeuronsForLayer(x).ToList().ForEach(y =>
                     {

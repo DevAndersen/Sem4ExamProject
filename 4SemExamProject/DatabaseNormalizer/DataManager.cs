@@ -112,9 +112,9 @@ namespace DatabaseNormalizer
             return new NormalizedDataAndDictionaries(normalizedData, dataDictionaries, denormalizationVariablesList);
         }
 
-        private static double NormalizeIndex(int index, int length, double normalizationMinimum, double normalizationMaximum)
+        private static double NormalizeIndex(int index, int length, double normalizedFloor, double normalizedCeiling)
         {
-            return normalizationMinimum + ((double)index / (length - 1)) * (normalizationMaximum - normalizationMinimum);
+            return normalizedFloor + ((double)index / (length - 1)) * (normalizedCeiling - normalizedFloor);
         }
 
         private static double NormalizeNumeric(double value, double normalizedFloor, double normalizedCeiling, double normalizationMargin, double smallestTrainingValue, double largestTrainingValue)

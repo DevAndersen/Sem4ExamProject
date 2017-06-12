@@ -17,7 +17,7 @@ namespace NeatLib
         /// <summary>
         /// Initialize a neuron for use in the input or output layer.
         /// </summary>
-        public Neuron(BaseNeuronType baseNeuronType, int neuronPosition)
+        public Neuron(IONeuronType baseNeuronType, int neuronPosition)
         {
             Layer = (int)baseNeuronType;
             NeuronPosition = neuronPosition;
@@ -34,7 +34,7 @@ namespace NeatLib
             NeuronPosition = neuronPosition;
         }
 
-        public enum BaseNeuronType
+        public enum IONeuronType
         {
             Input = -1,
             Output = -2
